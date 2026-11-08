@@ -45,6 +45,7 @@ ICONS = {
     'plus': ['...##...', '...##...', '...##...', '########', '########', '...##...', '...##...', '...##...'],
     'check': ['.......#', '......##', '.....##.', '#...##..', '##.##...', '.###....', '..#.....', '........'],
     'heart': ['.##..##.', '########', '########', '########', '.######.', '..####..', '...##...', '........'],
+    'home': ['...##...', '..####..', '.######.', '########', '.##..##.', '.##..##.', '.##..##.', '.##..##.'],
 }
 
 
@@ -142,6 +143,17 @@ def build_favicon():
     return face
 
 
+def build_app_icons(face):
+    """Home-screen / install icons (web app manifest). The face sits inside the central
+    safe zone so the same file also works as a maskable icon."""
+    for size in (192, 512):
+        icon = Image.new('RGBA', (size, size), hexrgb('#1a120c'))
+        k = max(1, int(size * 0.56) // face.height)
+        a = upscale(face, k)
+        icon.alpha_composite(a, ((size - a.width) // 2, (size - a.height) // 2 + k // 2))
+        icon.save(os.path.join(UI, f'icon-{size}.png'), optimize=True)
+
+
 def pixel_text(text, color, outline_color=(26, 18, 12, 255), shadow=None):
     font = ImageFont.truetype(FONT, 8)
     w = len(text) * 8 + 4
@@ -230,6 +242,7 @@ def main():
     build_snow_tile()
     build_help_icons()
     face = build_favicon()
+    build_app_icons(face)
     logo = build_logo()
     if PREVIEW:
         upscale(logo, 6).save(os.path.join(PREVIEW, 'logo.png'))

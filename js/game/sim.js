@@ -42,6 +42,7 @@ export class Sim {
     this.lastBreakAt = -99;
     this.stats = { broken: 0, drinks: 0, bestCombo: 0, maxBuzz: 0, reserves: 0, blackouts: 0, bonusTime: 0 };
     this.puddles = [];
+    this.buffered = null;       // { kind: 'action' | 'up' | 'down', until }
     this.seq = 0;
     this.restockAt = WORLD.shelf.xs.map(() => 0);
     this.spawnBottles();
@@ -57,6 +58,7 @@ export class Sim {
 
   pause() {
     if (this.phase !== 'playing' && this.phase !== 'ready') return false;
+    this.buffered = null;       // the clock stops while paused; don't fire stale presses on resume
     this.pausedFrom = this.phase;
     this.setPhase('paused');
     return true;
@@ -178,9 +180,34 @@ export class Sim {
   }
 
   // ---------------------------------------------------------------- actions
-  climbUp() {
+  /** Remember a press that came a moment too early; stepRaccoon replays it when it can. */
+  bufferInput(kind) {
+    if (this.active) this.buffered = { kind, until: this.t + C.INPUT_BUFFER };
+  }
+
+  replayBuffered() {
+    const b = this.buffered;
+    if (!b) return;
+    if (this.t > b.until) {
+      this.buffered = null;
+      return;
+    }
     const r = this.r;
-    if (!this.canAct() || r.climbCd > 0) return;
+    if (!this.canAct()) return;
+    if (b.kind === 'action' ? r.level >= 0 && r.swipeCd > 0 : r.climbCd > 0) return;
+    this.buffered = null;
+    if (b.kind === 'action') this.action();
+    else if (b.kind === 'up') this.climbUp();
+    else this.climbDown();
+  }
+
+  /** `held`: called every step while up is held, which repeats on its own (no buffering). */
+  climbUp(held = false) {
+    const r = this.r;
+    if (!this.canAct() || r.climbCd > 0) {
+      if (!held) this.bufferInput('up');
+      return;
+    }
     const unit = r.level >= 0 ? r.unit : this.unitAt(r.x);
     if (unit === -1 || r.level >= TOP_LEVEL) return;
     r.climbCd = C.CLIMB_COOLDOWN;
@@ -200,9 +227,13 @@ export class Sim {
     this.startClimb(r.level + 1, unit, 'up');
   }
 
-  climbDown() {
+  climbDown(held = false) {
     const r = this.r;
-    if (!this.canAct() || r.climbCd > 0 || r.level < 0) return;
+    if (!this.canAct() || r.climbCd > 0) {
+      if (!held) this.bufferInput('down');
+      return;
+    }
+    if (r.level < 0) return;
     r.climbCd = C.CLIMB_COOLDOWN;
     this.startClimb(r.level - 1, r.level - 1 >= 0 ? r.unit : -1, 'down');
   }
@@ -218,14 +249,20 @@ export class Sim {
 
   action() {
     const r = this.r;
-    if (!this.canAct()) return;
+    if (!this.canAct()) {
+      this.bufferInput('action');
+      return;
+    }
     if (r.level >= 0) this.swipe();
     else this.drink();
   }
 
   swipe() {
     const r = this.r;
-    if (r.swipeCd > 0) return;
+    if (r.swipeCd > 0) {
+      this.bufferInput('action');
+      return;
+    }
     r.swipeT = C.SWIPE_TIME;
     r.swipeCd = C.SWIPE_COOLDOWN;
     r.drinkT = 0;
@@ -448,9 +485,10 @@ export class Sim {
       return;
     }
 
-    // held up/down climbs repeatedly (cooldown-limited)
-    if (this.input.up) this.climbUp();
-    if (this.input.down) this.climbDown();
+    // a press that came a moment early, then held up/down (climbs repeatedly, cooldown-limited)
+    this.replayBuffered();
+    if (this.input.up) this.climbUp(true);
+    if (this.input.down) this.climbDown(true);
 
     const left = this.input.left && !this.input.right;
     const right = this.input.right && !this.input.left;

@@ -57,9 +57,11 @@ export class Input {
     this.sync();
   }
 
+  /** Forget every held key and touch (pause, blur, controls hidden). */
   releaseAll() {
     this.held.clear();
     this.touchDir = { left: false, right: false, up: false, down: false };
+    if (this.pad) this.pad.dataset.dir = '';
     this.sync();
   }
 
@@ -75,12 +77,18 @@ export class Input {
     i.down = this.any(KEYS.down) || this.touchDir.down;
   }
 
-  /** Wire the on-screen D-pad and action button. */
-  bindTouch(pad, actionBtn) {
+  /**
+   * Wire the on-screen controls. Each zone is much bigger than its art: anywhere in the
+   * move zone steers relative to the pad's centre, anywhere in the act zone swipes or
+   * drinks. Multi-touch is tracked per pointer, so one thumb can hold a direction while
+   * the other taps the paw.
+   */
+  bindTouch({ moveZone, pad, actZone, actionBtn }) {
+    this.pad = pad;
     const pointers = new Map();
     const recompute = () => {
       const d = { left: false, right: false, up: false, down: false };
-      for (const v of pointers.values()) Object.assign(d, Object.fromEntries(Object.entries(v).filter(([, on]) => on)));
+      for (const v of pointers.values()) for (const k in v) if (v[k]) d[k] = true;
       const was = this.touchDir;
       this.touchDir = d;
       if (d.up && !was.up) this.sim.climbUp();
@@ -90,55 +98,65 @@ export class Input {
     };
     const dirFor = (e) => {
       const r = pad.getBoundingClientRect();
-      const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-      const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
       const d = { left: false, right: false, up: false, down: false };
-      if (Math.hypot(x, y) < 0.18) return d;
-      const ang = Math.atan2(y, x);
+      if (Math.hypot(dx, dy) < r.width * 0.09) return d; // small dead zone on the hub
       // 8-way with generous horizontal sectors: walking matters most
-      const deg = (ang * 180) / Math.PI;
+      const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
       if (deg > -60 && deg < 60) d.right = true;
       if (deg > 120 || deg < -120) d.left = true;
       if (deg < -30 && deg > -150) d.up = true;
       if (deg > 30 && deg < 150) d.down = true;
       return d;
     };
-    pad.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
+    const capture = (el, id) => {
       try {
-        pad.setPointerCapture(e.pointerId);
+        el.setPointerCapture(id);
       } catch {
-        /* capture is a nicety (keeps tracking off-pad); movement works without it */
+        /* capture is a nicety (keeps tracking a thumb that slides off); input works without it */
       }
+    };
+
+    // These zones are controls, not page: no scroll, zoom, selection or context menu, however
+    // fast the taps come (CSS touch-action covers modern browsers, this covers the rest).
+    for (const zone of [moveZone, actZone]) {
+      zone.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+      zone.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    moveZone.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      capture(moveZone, e.pointerId);
       pointers.set(e.pointerId, dirFor(e));
       this.h.onTouchStart?.();
       recompute();
     });
-    pad.addEventListener('pointermove', (e) => {
+    moveZone.addEventListener('pointermove', (e) => {
       if (!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, dirFor(e));
       recompute();
     });
-    const end = (e) => {
-      pointers.delete(e.pointerId);
+    const release = (e) => {
+      if (!pointers.delete(e.pointerId)) return;
       recompute();
     };
-    pad.addEventListener('pointerup', end);
-    pad.addEventListener('pointercancel', end);
-    pad.addEventListener('lostpointercapture', end);
-    pad.addEventListener('contextmenu', (e) => e.preventDefault());
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) moveZone.addEventListener(type, release);
 
-    actionBtn.addEventListener('pointerdown', (e) => {
+    const pressing = new Set();
+    actZone.addEventListener('pointerdown', (e) => {
       e.preventDefault();
+      capture(actZone, e.pointerId);
+      pressing.add(e.pointerId);
       actionBtn.classList.add('is-down');
       this.h.onTouchStart?.();
       this.sim.action();
     });
-    const up = () => actionBtn.classList.remove('is-down');
-    actionBtn.addEventListener('pointerup', up);
-    actionBtn.addEventListener('pointercancel', up);
-    actionBtn.addEventListener('pointerleave', up);
-    actionBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+    const lift = (e) => {
+      pressing.delete(e.pointerId);
+      if (!pressing.size) actionBtn.classList.remove('is-down');
+    };
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) actZone.addEventListener(type, lift);
   }
 
   destroy() {

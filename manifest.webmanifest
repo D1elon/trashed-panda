@@ -1,0 +1,18 @@
+{
+  "name": "Trashed Panda: Holiday Edition",
+  "short_name": "Trashed Panda",
+  "description": "A 60-second pixel-art arcade game based on the true story of the raccoon who raided the Ashland, VA liquor store.",
+  "id": "/play/",
+  "start_url": "/play/",
+  "scope": "/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0a0605",
+  "theme_color": "#0a0605",
+  "categories": ["games"],
+  "icons": [
+    { "src": "/assets/ui/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/ui/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/ui/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -404,8 +404,8 @@ kbd .ico {
   display: flex;
   align-items: center;
   gap: 24px;
-  height: var(--nav-h);
-  padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-left));
+  height: calc(var(--nav-h) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
   background: #100a07;
   box-shadow: 0 var(--px) 0 var(--ink), 0 calc(var(--px) * 2) 0 rgba(242, 169, 59, 0.12);
 }

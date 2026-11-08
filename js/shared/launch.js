@@ -26,7 +26,9 @@ function previewing() {
 
 export const shopOpen = !STORE.comingSoon || previewing();
 
-export function applyShopState() {
+/** Show/hide the data-when content. `badge: false` skips the preview badge (the game
+ *  page keeps its corners free for the touch controls). */
+export function applyShopState({ badge = true } = {}) {
   document.documentElement.dataset.shop = shopOpen ? 'open' : 'soon';
   if (!shopOpen && STORE.notifyUrl) {
     for (const a of document.querySelectorAll('a[data-notify]')) {
@@ -34,7 +36,7 @@ export function applyShopState() {
       a.hidden = false;
     }
   }
-  if (shopOpen && STORE.comingSoon) previewBadge();
+  if (badge && shopOpen && STORE.comingSoon) previewBadge();
 }
 
 function previewBadge() {
