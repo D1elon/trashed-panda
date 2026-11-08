@@ -5,6 +5,12 @@
 export const STORE = {
   currency: 'USD',
 
+  // Coming-soon mode. While true, the live site says the holiday drop is coming soon:
+  // the shop page shows a teaser instead of products and cart, and the home page and
+  // game stop linking to products. Set to false to open the shop.
+  // To review the full shop while this is on, add ?preview to the URL (?preview=off to exit).
+  comingSoon: true,
+
   // Checkout. Until a provider is connected the shop is fully browsable, the cart
   // works, and "Checkout" explains that orders open soon.
   //   provider: 'none'     -> pre-launch mode

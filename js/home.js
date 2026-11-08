@@ -2,14 +2,18 @@
 
 import { PRODUCTS, productById, imageFor, formatPrice } from './shop/catalog.js';
 import { cart, bindCartBadges } from './shared/cart.js';
+import { shopOpen, applyShopState } from './shared/launch.js';
+
+applyShopState();
 
 // Drop cart lines for products that no longer exist, so the badge count stays honest.
 for (const l of cart.lines) if (!productById(l.productId)) cart.remove(l.id);
 bindCartBadges();
 
+// Product cards only while the shop is open; otherwise the teaser says "coming soon".
 const FEATURED = ['ugly-sweater', 'naughty-list-tee', 'pixel-ornament'];
 const grid = document.getElementById('teaser-grid');
-if (grid) {
+if (grid && shopOpen) {
   grid.innerHTML = FEATURED.map((id) => PRODUCTS.find((p) => p.id === id))
     .filter(Boolean)
     .map((p) => {

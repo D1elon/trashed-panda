@@ -10,7 +10,7 @@ This is the **Holiday Edition**, with a merch shop.
 | | |
 | --- | --- |
 | `index.html` | The game, plus the true story and a teaser for the holiday drop |
-| `shop/` | The holiday merch store (see [docs/SHOP_SETUP.md](docs/SHOP_SETUP.md) to take orders) |
+| `shop/` | The holiday merch store, currently in coming-soon mode (see [docs/SHOP_SETUP.md](docs/SHOP_SETUP.md) to preview it and take orders) |
 | `js/game/` | Game engine: simulation, canvas renderer, synthesized audio, input, UI |
 | `js/shop/` | Store catalog (`catalog.js`) and storefront logic |
 | `css/` | Shared pixel design system (`site.css`) and page styles |

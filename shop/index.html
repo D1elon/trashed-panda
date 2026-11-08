@@ -26,7 +26,7 @@
   <script type="module" src="../js/shop/shop.js"></script>
 </head>
 <body class="page-shop">
-  <a class="skip-link" href="#products">Skip to products</a>
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="nav">
     <a class="nav__brand" href="../" aria-label="Trashed Panda home">
@@ -35,30 +35,33 @@
     </a>
     <nav class="nav__links" aria-label="Main">
       <a href="../#play">Play</a>
-      <a href="./" aria-current="page">Shop <span class="tag tag--red">Holiday drop</span></a>
+      <a href="./" aria-current="page">Shop <span class="tag tag--red" data-when="open">Holiday drop</span><span class="tag tag--red" data-when="soon">Soon</span></a>
     </nav>
-    <button class="nav__cart" type="button" id="open-cart" aria-label="Open cart">
+    <button class="nav__cart" type="button" id="open-cart" aria-label="Open cart" data-when="open">
       <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-cart" /></svg>
       <span class="nav__count" data-cart-count hidden>0</span>
     </button>
   </header>
 
-  <main>
+  <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero__text">
         <p class="eyebrow eyebrow--red">
           <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-snow" /></svg>
-          The holiday drop
+          <span data-when="open">The holiday drop</span><span data-when="soon">The holiday drop · Coming soon</span>
         </p>
         <h1 id="hero-title">Gifts with a criminal record.</h1>
-        <p class="hero__lede">Ugly sweaters, ornaments, socks and more for the trash panda in your life, drawn pixel by pixel in the same style as the game.</p>
-        <p class="hero__note" id="order-by" hidden>
+        <p class="hero__lede" data-when="open">Ugly sweaters, ornaments, socks and more for the trash panda in your life, drawn pixel by pixel in the same style as the game.</p>
+        <p class="hero__lede" data-when="soon">A knitted ugly sweater, porcelain ornaments, tees, socks and more for the trash panda in your life, drawn pixel by pixel in the same style as the game. The shop opens soon.</p>
+        <p class="hero__note" id="order-by" data-when="open" hidden>
           <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-truck" /></svg>
           <span></span>
         </p>
         <div class="hero__cta">
-          <a class="btn btn--holiday btn--lg" href="#products">Shop the drop</a>
-          <a class="btn btn--lg" href="../#play">Play the game</a>
+          <a class="btn btn--holiday btn--lg" href="#products" data-when="open">Shop the drop</a>
+          <a class="btn btn--holiday btn--lg" data-when="soon" data-notify hidden target="_blank" rel="noopener">Get notified</a>
+          <a class="btn btn--lg" href="../#play" data-when="open">Play the game</a>
+          <a class="btn btn--primary btn--lg" href="../#play" data-when="soon">Play the game</a>
         </div>
       </div>
       <div class="hero__art" aria-hidden="true">
@@ -73,7 +76,7 @@
       <p></p>
     </aside>
 
-    <section class="products" id="products" aria-labelledby="products-title">
+    <section class="products" id="products" aria-labelledby="products-title" data-when="open">
       <div class="products__bar">
         <h2 id="products-title">The drop</h2>
         <div class="chips" id="chips" role="group" aria-label="Filter products"></div>
@@ -99,7 +102,7 @@
       </div>
     </section>
 
-    <section class="faq" id="faq" aria-labelledby="faq-title">
+    <section class="faq" id="faq" aria-labelledby="faq-title" data-when="open">
       <h2 id="faq-title">Questions</h2>
       <details>
         <summary>When will my order arrive?</summary>

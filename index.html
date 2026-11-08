@@ -37,9 +37,9 @@
     </a>
     <nav class="nav__links" aria-label="Main">
       <a href="./#play" aria-current="page">Play</a>
-      <a href="shop/">Shop <span class="tag tag--red">Holiday drop</span></a>
+      <a href="shop/">Shop <span class="tag tag--red" data-when="open">Holiday drop</span><span class="tag tag--red" data-when="soon">Soon</span></a>
     </nav>
-    <a class="nav__cart" href="shop/#cart" aria-label="Cart">
+    <a class="nav__cart" href="shop/#cart" aria-label="Cart" data-when="open">
       <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-cart" /></svg>
       <span class="nav__count" data-cart-count hidden>0</span>
     </a>
@@ -199,7 +199,8 @@
             </div>
             <a class="merch-cta" href="shop/">
               <img src="assets/shop/sweater-red-front.png" alt="" width="80" height="80" />
-              <span><b>Wear the crime.</b> The holiday drop is live: ugly sweaters, ornaments &amp; more.</span>
+              <span data-when="open"><b>Wear the crime.</b> The holiday drop is live: ugly sweaters, ornaments &amp; more.</span>
+              <span data-when="soon"><b>Wear the crime.</b> The holiday drop is coming soon: ugly sweaters, ornaments &amp; more.</span>
               <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-right" /></svg>
             </a>
           </div>
@@ -239,19 +240,21 @@
 
     <section class="teaser" id="holiday-drop" aria-labelledby="drop-title">
       <div class="teaser__head">
-        <p class="eyebrow eyebrow--red">Holiday drop</p>
+        <p class="eyebrow eyebrow--red"><span data-when="open">Holiday drop</span><span data-when="soon">Holiday drop · Coming soon</span></p>
         <h2 id="drop-title">Gifts for the trash panda in your life</h2>
-        <p>Ugly sweaters, ornaments, socks and more, drawn pixel by pixel in the same style as the game.</p>
+        <p data-when="open">Ugly sweaters, ornaments, socks and more, drawn pixel by pixel in the same style as the game.</p>
+        <p data-when="soon">A knitted ugly sweater, porcelain ornaments, tees, socks and more, drawn pixel by pixel in the same style as the game. The shop opens soon.</p>
       </div>
-      <div class="teaser__grid" id="teaser-grid"></div>
-      <p class="teaser__more"><a class="btn btn--holiday btn--lg" href="shop/">Shop the drop</a></p>
+      <div class="teaser__grid" id="teaser-grid" data-when="open"></div>
+      <p class="teaser__more" data-when="open"><a class="btn btn--holiday btn--lg" href="shop/">Shop the drop</a></p>
+      <p class="teaser__more" data-when="soon"><a class="btn btn--holiday btn--lg" data-notify hidden target="_blank" rel="noopener">Get notified</a></p>
     </section>
   </main>
 
   <footer class="foot">
     <img src="assets/ui/raccoon-face.png" width="18" height="22" alt="" />
     <p>Trashed Panda is a fan-made game inspired by a true story. Not affiliated with Virginia ABC.</p>
-    <p>Made by <a href="https://github.com/D1elon" rel="noopener">D1elon</a> · <a href="shop/">Shop</a> · <a href="shop/#faq">Shipping &amp; returns</a></p>
+    <p>Made by <a href="https://github.com/D1elon" rel="noopener">D1elon</a> · <a href="shop/">Shop</a><span data-when="open"> · <a href="shop/#faq">Shipping &amp; returns</a></span></p>
   </footer>
 </body>
 </html>

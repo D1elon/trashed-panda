@@ -1,9 +1,26 @@
 # Opening the holiday shop
 
 The shop at `/shop/` is fully built: products, variants, cart and checkout button.
-Until you connect a checkout it runs in **pre-launch mode**: everything is browsable,
-carts are saved on the visitor's device, and the Checkout button explains that orders
-open soon. Everything you need to change lives in **`js/shop/catalog.js`**.
+Everything you need to change lives in **`js/shop/catalog.js`**.
+
+## 0. Coming soon (the live default)
+
+While `STORE.comingSoon` is `true`, the live site says the holiday drop is **coming soon**:
+
+* `/shop/` shows the hero and a "coming soon" message. No products, cart or FAQ, and old
+  product or cart links (`#p=...`, `#cart`) land on that page.
+* The home page teaser, the nav badge and the link on the game-over screen say "coming
+  soon" and link to no products.
+* If you set `notifyUrl`, a **Get notified** button appears on both pages.
+
+To review the full shop while it is hidden, add **`?preview`** to any URL
+(e.g. `https://www.trashedpanda.lol/shop/?preview`). A yellow badge marks preview mode; it
+is remembered for that browser tab, and **Exit preview** (or `?preview=off`) goes back to
+the public view. Anyone who knows the trick can use it, so treat it as a curtain, not a lock.
+
+When you're ready, set `comingSoon: false` and deploy. If checkout isn't connected yet,
+the shop then runs in **pre-launch mode**: everything is browsable, carts are saved on the
+visitor's device, and the Checkout button explains that orders open soon.
 
 ## 1. Pick how orders get fulfilled
 
@@ -87,6 +104,7 @@ the customer sees a friendly message instead of a broken checkout.
 
 ## Before you launch, check
 
+- [ ] `comingSoon` is `false` in `catalog.js`.
 - [ ] Prices in `catalog.js` match Shopify.
 - [ ] A sample of each product has been checked against `merch/<product>/mockups/`.
 - [ ] The returns and shipping answers in the FAQ (`shop/index.html`) match your provider's policies.

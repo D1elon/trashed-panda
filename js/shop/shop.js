@@ -2,6 +2,7 @@
 
 import { STORE, PRODUCTS, CATEGORIES, productById, defaultOptions, visualOption, imageFor, viewsFor, variantLabel, formatPrice } from './catalog.js';
 import { cart, bindCartBadges, lineKey } from '../shared/cart.js';
+import { shopOpen, applyShopState } from '../shared/launch.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const ICONS = new URL('../../assets/ui/icons.svg', import.meta.url).href;
@@ -352,6 +353,14 @@ function route() {
 }
 
 function boot() {
+  applyShopState();
+  if (!shopOpen) {
+    // Coming soon: hero + promise only. Old product or cart links land on the teaser.
+    if (location.hash.startsWith('#p=') || location.hash === '#cart') history.replaceState(null, '', location.pathname + location.search);
+    document.title = 'Coming Soon · Trashed Panda Holiday Shop';
+    heroSnow();
+    return;
+  }
   renderChips();
   renderGrid();
   // Drop cart lines for products that no longer exist (e.g. after a catalog change).
