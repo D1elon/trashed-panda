@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Holiday Shop · Trashed Panda</title>
+  <meta name="description" content="Pixel-art holiday merch from Trashed Panda: ugly sweaters, ornaments, tees, socks, mugs and more, drawn in the same style as the game." />
+  <meta name="theme-color" content="#140d09" />
+  <link rel="canonical" href="https://www.trashedpanda.lol/shop/" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Trashed Panda" />
+  <meta property="og:title" content="The Trashed Panda Holiday Drop" />
+  <meta property="og:description" content="Gifts with a criminal record. Ugly sweaters, ornaments and more, drawn pixel by pixel." />
+  <meta property="og:url" content="https://www.trashedpanda.lol/shop/" />
+  <meta property="og:image" content="https://www.trashedpanda.lol/assets/ui/og-shop.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://www.trashedpanda.lol/assets/ui/og-shop.png" />
+  <link rel="preload" href="../assets/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../css/site.css" />
+  <link rel="stylesheet" href="../css/shop.css" />
+  <script type="module" src="../js/shop/shop.js"></script>
+</head>
+<body class="page-shop">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <a class="nav__brand" href="../" aria-label="Trashed Panda home">
+      <img src="../assets/ui/raccoon-face.png" width="18" height="22" alt="" />
+      <span>Trashed Panda</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="../#play">Play</a>
+      <a href="./" aria-current="page">Shop <span class="tag tag--red" data-when="open">Holiday drop</span><span class="tag tag--red" data-when="soon">Soon</span></a>
+    </nav>
+    <button class="nav__cart" type="button" id="open-cart" aria-label="Open cart" data-when="open">
+      <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-cart" /></svg>
+      <span class="nav__count" data-cart-count hidden>0</span>
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__text">
+        <p class="eyebrow eyebrow--red">
+          <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-snow" /></svg>
+          <span data-when="open">The holiday drop</span><span data-when="soon">The holiday drop · Coming soon</span>
+        </p>
+        <h1 id="hero-title">Gifts with a criminal record.</h1>
+        <p class="hero__lede" data-when="open">Ugly sweaters, ornaments, socks and more for the trash panda in your life, drawn pixel by pixel in the same style as the game.</p>
+        <p class="hero__lede" data-when="soon">A knitted ugly sweater, porcelain ornaments, tees, socks and more for the trash panda in your life, drawn pixel by pixel in the same style as the game. The shop opens soon.</p>
+        <p class="hero__note" id="order-by" data-when="open" hidden>
+          <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-truck" /></svg>
+          <span></span>
+        </p>
+        <div class="hero__cta">
+          <a class="btn btn--holiday btn--lg" href="#products" data-when="open">Shop the drop</a>
+          <a class="btn btn--holiday btn--lg" data-when="soon" data-notify hidden target="_blank" rel="noopener">Get notified</a>
+          <a class="btn btn--lg" href="../#play" data-when="open">Play the game</a>
+          <a class="btn btn--primary btn--lg" href="../#play" data-when="soon">Play the game</a>
+        </div>
+      </div>
+      <div class="hero__art" aria-hidden="true">
+        <canvas class="hero__snow" id="hero-snow"></canvas>
+        <img class="hero__item hero__item--sweater" src="../assets/shop/sweater-red-front.png" width="160" height="160" alt="" />
+        <img class="hero__item hero__item--ornament" src="../assets/shop/ornament-reserve.png" width="160" height="160" alt="" />
+      </div>
+    </section>
+
+    <aside class="giveback" id="giveback" hidden>
+      <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-heart" /></svg>
+      <p></p>
+    </aside>
+
+    <section class="products" id="products" aria-labelledby="products-title" data-when="open">
+      <div class="products__bar">
+        <h2 id="products-title">The drop</h2>
+        <div class="chips" id="chips" role="group" aria-label="Filter products"></div>
+      </div>
+      <div class="grid" id="grid" aria-live="polite"></div>
+    </section>
+
+    <section class="promise" aria-label="How it works">
+      <div class="promise__item">
+        <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-star" /></svg>
+        <h3>Drawn for the game</h3>
+        <p>Every design is pixel art from Trashed Panda: the same raccoon, the same bottles, the same font.</p>
+      </div>
+      <div class="promise__item">
+        <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-gift" /></svg>
+        <h3>Made to order</h3>
+        <p>Nothing sits in a warehouse. Each piece is printed, knitted or embroidered when you order it, then shipped to your door.</p>
+      </div>
+      <div class="promise__item">
+        <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-check" /></svg>
+        <h3>Sharp to the pixel</h3>
+        <p>Designs are scaled in whole pixels, so every edge prints crisp. No blur, no fuzz.</p>
+      </div>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-title" data-when="open">
+      <h2 id="faq-title">Questions</h2>
+      <details>
+        <summary>When will my order arrive?</summary>
+        <p>Each item is printed when you order it and then shipped, and you’ll see a delivery estimate at checkout. For the holidays, order early: the cut-off date is shown at the top of this page.</p>
+      </details>
+      <details>
+        <summary>Can I return something?</summary>
+        <p>Everything is made to order, so we can’t take returns for a change of mind. If an item arrives damaged, misprinted or in the wrong size, contact us within 30 days and we’ll replace it.</p>
+      </details>
+      <details>
+        <summary>How do the sizes run?</summary>
+        <p>All apparel is a unisex fit, so if you usually wear women’s sizes, go one size down. Socks come in S/M and L/XL, and the beanie is one size. Want the ugly sweater extra cosy? Size up.</p>
+      </details>
+      <details>
+        <summary>Is this official?</summary>
+        <p>Trashed Panda is an independent fan project inspired by a true story. It isn’t affiliated with Virginia ABC, Hanover County or, as far as we know, the raccoon.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <img src="../assets/ui/raccoon-face.png" width="18" height="22" alt="" />
+    <p>Trashed Panda is a fan-made game inspired by a true story. Not affiliated with Virginia ABC.</p>
+    <p>Made by <a href="https://github.com/D1elon" rel="noopener">D1elon</a> · <a href="../#play">Play the game</a></p>
+  </footer>
+
+  <dialog class="pdp" id="pdp" aria-labelledby="pdp-title"></dialog>
+
+  <dialog class="drawer" id="cart" aria-labelledby="cart-title">
+    <div class="drawer__head">
+      <h2 id="cart-title">Your cart</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close cart">
+        <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-close" /></svg>
+      </button>
+    </div>
+    <div class="drawer__body" id="cart-body"></div>
+    <div class="drawer__foot" id="cart-foot"></div>
+  </dialog>
+
+  <dialog class="notice" id="notice" aria-labelledby="notice-title"></dialog>
+
+  <div class="toast toast--fixed" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

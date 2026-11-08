@@ -1,0 +1,7 @@
+# GitHub Pages: the site is plain static files. Keep build tooling and print masters
+# out of the published site.
+exclude:
+  - tools
+  - merch
+  - docs
+  - README.md
