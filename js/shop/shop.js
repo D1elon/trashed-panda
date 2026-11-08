@@ -1,6 +1,6 @@
 // Holiday shop: product grid, product detail, cart drawer and checkout handoff.
 
-import { STORE, PRODUCTS, CATEGORIES, productById, defaultOptions, visualOption, imageFor, designFor, variantLabel, formatPrice } from './catalog.js';
+import { STORE, PRODUCTS, CATEGORIES, productById, defaultOptions, visualOption, imageFor, viewsFor, variantLabel, formatPrice } from './catalog.js';
 import { cart, bindCartBadges, lineKey } from '../shared/cart.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -36,7 +36,7 @@ function cardHtml(p) {
   return `
     <a class="card" href="#p=${p.id}" data-product="${p.id}">
       <span class="card__art" style="--art-bg:${img.bg}">
-        <img src="${img.src}" width="128" height="128" alt="${esc(p.name)}" loading="lazy" />
+        <img src="${img.src}" width="160" height="160" alt="${esc(p.name)}" loading="lazy" />
         ${p.badge ? `<span class="tag tag--gold card__badge">${esc(p.badge)}</span>` : ''}
       </span>
       <span class="card__body">
@@ -59,16 +59,17 @@ let current = null;
 function openProduct(id, { push = true } = {}) {
   const p = productById(id);
   if (!p) return;
-  current = { p, options: defaultOptions(p), qty: 1, view: 'product' };
+  current = { p, options: defaultOptions(p), qty: 1, view: 0 };
   renderProduct();
   if (!pdp.open) pdp.showModal();
   if (push) history.replaceState(null, '', `#p=${id}`);
 }
 
 function renderProduct() {
-  const { p, options, qty, view } = current;
-  const img = imageFor(p, options);
-  const design = designFor(p, options);
+  const { p, options, qty } = current;
+  const views = viewsFor(p, options);
+  const view = Math.min(current.view, views.length - 1);
+  const shown = views[view];
   const optionHtml = Object.entries(p.options)
     .filter(([, vals]) => vals.length > 1 || typeof vals[0] === 'object')
     .map(([name, vals]) => {
@@ -78,7 +79,7 @@ function renderProduct() {
           const value = visual ? v.value : v;
           const sel = options[name] === value;
           return visual
-            ? `<button type="button" class="opt opt--visual" data-opt="${esc(name)}" data-val="${esc(value)}" aria-pressed="${sel}" title="${esc(value)}"><img src="${imageFor(p, { ...options, [name]: value }).src}" width="128" height="128" alt="" /><span>${esc(value)}</span></button>`
+            ? `<button type="button" class="opt opt--visual" data-opt="${esc(name)}" data-val="${esc(value)}" aria-pressed="${sel}" title="${esc(value)}"><img src="${imageFor(p, { ...options, [name]: value }).src}" width="160" height="160" alt="" /><span>${esc(value)}</span></button>`
             : `<button type="button" class="opt" data-opt="${esc(name)}" data-val="${esc(value)}" aria-pressed="${sel}">${esc(value)}</button>`;
         })
         .join('');
@@ -90,9 +91,9 @@ function renderProduct() {
   pdp.innerHTML = `
     <div class="pdp__inner">
       <button class="icon-btn pdp__close" type="button" data-close aria-label="Close">${icon('close')}</button>
-      <div class="pdp__media" style="--art-bg:${view === 'design' ? img.designBg : img.bg}">
-        <img class="pdp__img" src="${view === 'design' && design ? design : img.src}" alt="${esc(p.name)}${view === 'design' ? ' design' : ''}" data-view="${view}" />
-        ${design ? `<div class="seg" role="group" aria-label="Preview"><button type="button" data-view="product" aria-pressed="${view === 'product'}">Product</button><button type="button" data-view="design" aria-pressed="${view === 'design'}">Design</button></div>` : ''}
+      <div class="pdp__media" style="--art-bg:${shown.bg}">
+        <img class="pdp__img${shown.flat ? ' pdp__img--flat' : ''}" src="${shown.src}" alt="${esc(p.name)}: ${esc(shown.label.toLowerCase())}" ${shown.flat ? 'style="visibility:hidden"' : 'width="160" height="160"'} />
+        ${views.length > 1 ? `<div class="seg" role="group" aria-label="Views">${views.map((v, i) => `<button type="button" data-view="${i}" aria-pressed="${i === view}">${esc(v.label)}</button>`).join('')}</div>` : ''}
       </div>
       <div class="pdp__info">
         ${p.badge ? `<span class="tag tag--gold">${esc(p.badge)}</span>` : ''}
@@ -111,18 +112,22 @@ function renderProduct() {
         <ul class="pdp__details">${p.details.map((d) => `<li>${icon('check')}${esc(d)}</li>`).join('')}</ul>
       </div>
     </div>`;
-  if (view === 'design') requestAnimationFrame(fitDesign);
+  if (shown.flat) requestAnimationFrame(fitFlat);
 }
 
-// Flat designs have arbitrary sizes: show them at the largest whole-number scale that fits.
-function fitDesign() {
-  const img = $('.pdp__img[data-view="design"]', pdp);
+// Print artwork comes in arbitrary sizes: show it at the largest whole-number scale that fits.
+function fitFlat() {
+  const img = $('.pdp__img--flat', pdp);
   if (!img) return;
   const apply = () => {
-    const box = img.parentElement.getBoundingClientRect();
-    const k = Math.max(1, Math.floor(Math.min((box.width - 48) / img.naturalWidth, (box.height - 120) / img.naturalHeight, 6)));
+    const box = img.parentElement;
+    const cs = getComputedStyle(box);
+    const w = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const h = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const k = Math.max(1, Math.floor(Math.min(w / img.naturalWidth, h / img.naturalHeight, 8)));
     img.style.width = `${img.naturalWidth * k}px`;
     img.style.height = `${img.naturalHeight * k}px`;
+    img.style.visibility = 'visible';
   };
   if (img.complete && img.naturalWidth) apply();
   else img.addEventListener('load', apply, { once: true });
@@ -137,15 +142,15 @@ pdp.addEventListener('click', (e) => {
     current.options[t.dataset.opt] = t.dataset.val;
     const keepFocus = `[data-opt="${t.dataset.opt}"][data-val="${t.dataset.val}"]`;
     renderProduct();
-    $(keepFocus, pdp)?.focus();
+    $(keepFocus, pdp)?.focus({ preventScroll: true });
   } else if (t.dataset.view) {
-    current.view = t.dataset.view;
+    current.view = Number(t.dataset.view);
     renderProduct();
-    $(`.seg [data-view="${current.view}"]`, pdp)?.focus();
+    $(`.seg [data-view="${current.view}"]`, pdp)?.focus({ preventScroll: true });
   } else if (t.dataset.qty) {
     current.qty = Math.max(1, Math.min(20, current.qty + Number(t.dataset.qty)));
     renderProduct();
-    $(`[data-qty="${t.dataset.qty}"]`, pdp)?.focus();
+    $(`[data-qty="${t.dataset.qty}"]`, pdp)?.focus({ preventScroll: true });
   } else if (t.hasAttribute('data-add')) {
     cart.add(current.p.id, { ...current.options }, current.qty);
     pdp.close();
@@ -169,10 +174,10 @@ function lineHtml(l) {
   const p = productById(l.productId);
   if (!p) return '';
   const img = imageFor(p, l.options);
-  const label = variantLabel(l.options);
+  const label = variantLabel(p, l.options);
   return `
     <li class="line" data-line="${esc(l.id)}">
-      <span class="line__art" style="--art-bg:${img.bg}"><img src="${img.src}" width="128" height="128" alt="" /></span>
+      <span class="line__art" style="--art-bg:${img.bg}"><img src="${img.src}" width="160" height="160" alt="" /></span>
       <span class="line__info">
         <span class="line__name">${esc(p.name)}</span>
         ${label ? `<span class="line__opts">${esc(label)}</span>` : ''}
@@ -200,7 +205,7 @@ function renderCart() {
   if (!lines.length) {
     body.innerHTML = `
       <div class="empty">
-        <img src="../assets/shop/design-passed-out.png" alt="" width="70" height="48" />
+        <img src="../assets/shop/print-sticker-passed-out.png" alt="" width="152" height="74" />
         <p><b>Your cart is empty.</b><br />The raccoon took everything.</p>
         <button class="btn btn--primary" type="button" data-close>Keep shopping</button>
       </div>`;
@@ -252,7 +257,7 @@ function checkout() {
       const p = productById(l.productId);
       const id = p && shopifyVariantId(p, l.options);
       if (!id) {
-        showNotice('Almost there', `“${p ? p.name : l.productId}” in ${variantLabel(l.options) || 'this option'} isn’t available to order yet. Remove it to check out the rest.`);
+        showNotice('Almost there', `“${p ? p.name : l.productId}” in ${variantLabel(p, l.options) || 'this option'} isn’t available to order yet. Remove it to check out the rest.`);
         return;
       }
       parts.push(`${encodeURIComponent(id)}:${l.qty}`);
@@ -349,6 +354,8 @@ function route() {
 function boot() {
   renderChips();
   renderGrid();
+  // Drop cart lines for products that no longer exist (e.g. after a catalog change).
+  for (const l of [...cart.lines]) if (!productById(l.productId)) cart.remove(l.id);
   bindCartBadges();
   cart.subscribe(() => {
     if (drawer.open) renderCart();

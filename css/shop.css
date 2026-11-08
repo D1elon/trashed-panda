@@ -88,20 +88,30 @@ main {
   z-index: 1;
 }
 
-.hero__item {
-  position: absolute;
-  z-index: 2;
-  width: 256px;
-  height: 256px;
+/* Hero scene: mockups placed in art pixels x k (whole-number scale), relative to the floor line */
+.hero__art {
+  container-type: inline-size;
 }
 
-.hero__item--sweater { left: 50%; bottom: 8%; transform: translateX(-50%); width: 384px; height: 384px; }
-.hero__item--ornament { left: 4%; top: 0; }
-.hero__item--mug { right: 2%; bottom: 6%; }
+.hero__item {
+  --k: 1;
+  position: absolute;
+  z-index: 2;
+  width: calc(160px * var(--k));
+  height: calc(160px * var(--k));
+}
 
-@media (max-width: 1100px) {
-  .hero__item--sweater { width: 256px; height: 256px; }
-  .hero__item { width: 192px; height: 192px; }
+@container (min-width: 300px) {
+  .hero__item { --k: 2; }
+}
+
+/* the ornament hangs from the top edge; the sweater rests on the floor */
+.hero__item--ornament { left: calc(6% - 34px * var(--k)); top: calc(-10px * var(--k)); z-index: 3; }
+.hero__item--sweater { right: calc(6% - 13px * var(--k)); bottom: calc(22% - 38px * var(--k)); }
+
+@container (max-width: 459px) {
+  .hero__item--ornament { display: none; }
+  .hero__item--sweater { right: auto; left: 50%; transform: translateX(-50%); }
 }
 
 @media (max-width: 860px) {
@@ -113,12 +123,6 @@ main {
     order: -1;
     min-height: 0;
   }
-}
-
-@media (max-width: 520px) {
-  .hero__item--sweater { width: 256px; height: 256px; bottom: 4%; }
-  .hero__item { width: 128px; height: 128px; }
-  .hero__item--ornament { left: 2%; top: 2%; }
 }
 
 /* ------------------------------------------------------------------ give back */
@@ -192,7 +196,7 @@ main {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 264px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 26px;
 }
 
@@ -202,22 +206,23 @@ main {
   container-type: inline-size;
 }
 
+/* 160px mockups, shown at whole-number scales only */
 .card__art img {
-  width: 128px;
-  height: 128px;
+  width: 160px;
+  height: 160px;
 }
 
-@container (min-width: 256px) {
+@container (min-width: 320px) {
   .card__art img {
-    width: 256px;
-    height: 256px;
+    width: 320px;
+    height: 320px;
   }
 }
 
-@container (min-width: 384px) {
+@container (min-width: 480px) {
   .card__art img {
-    width: 384px;
-    height: 384px;
+    width: 480px;
+    height: 480px;
   }
 }
 
@@ -406,15 +411,22 @@ dialog[open] {
 }
 
 .pdp__img {
-  width: 256px;
+  width: 160px;
+  height: 160px;
+}
+
+@container (min-width: 320px) {
+  .pdp__img { width: 320px; height: 320px; }
+}
+
+@container (min-width: 480px) {
+  .pdp__img { width: 480px; height: 480px; }
+}
+
+/* print artwork: sized in whole-number steps by fitFlat() in shop.js */
+.pdp__img--flat {
+  width: auto;
   height: auto;
-}
-
-@container (min-width: 420px) {
-  .pdp__img[data-view='product'] { width: 384px; }
-}
-
-.pdp__img[data-view='design'] {
   max-width: none;
 }
 
@@ -423,12 +435,15 @@ dialog[open] {
   left: 50%;
   bottom: 20px;
   display: flex;
+  max-width: calc(100% - 24px);
   transform: translateX(-50%);
   box-shadow: var(--frame);
 }
 
 .seg button {
-  padding: 10px 14px 8px;
+  flex: none;
+  white-space: nowrap;
+  padding: 10px 12px 8px;
   border: 0;
   font: 9px/1 var(--font-pixel);
   text-transform: uppercase;
@@ -534,8 +549,8 @@ dialog[open] {
 }
 
 .opt--visual img {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   image-rendering: auto;
 }
 
@@ -631,8 +646,8 @@ dialog[open] {
     grid-template-columns: 1fr;
   }
   .pdp__media {
-    min-height: 0;
-    padding: 56px 16px 72px;
+    min-height: 448px; /* 320px art + room for the view switcher, so switching views never jumps */
+    padding: 56px 8px 72px;
   }
   .pdp__info {
     padding: 24px 18px 32px;
@@ -707,14 +722,14 @@ dialog[open] {
 .line__art {
   display: grid;
   place-items: center;
-  width: 76px;
-  height: 76px;
+  width: 88px;
+  height: 88px;
   background: var(--art-bg);
 }
 
 .line__art img {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   image-rendering: auto;
 }
 
@@ -790,8 +805,8 @@ dialog[open] {
 }
 
 .empty img {
-  width: 140px;
-  height: auto;
+  width: 152px;
+  height: 74px;
 }
 
 .empty p {

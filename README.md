@@ -15,7 +15,7 @@ This is the **Holiday Edition**, with a merch shop.
 | `js/shop/` | Store catalog (`catalog.js`) and storefront logic |
 | `css/` | Shared pixel design system (`site.css`) and page styles |
 | `assets/` | Generated sprites, UI art, product mockups and fonts |
-| `merch/print-files/` | Print-ready artwork for every product (not deployed) |
+| `merch/` | Production package: print-ready files, spec sheets and a line sheet for every product (not deployed, see [merch/README.md](merch/README.md)) |
 | `tools/` | Python pipeline that generates every image from the source art (not deployed) |
 
 No build step and no dependencies: it's static HTML, CSS and ES modules, served as-is by
@@ -46,7 +46,8 @@ Then visit <http://localhost:8000>.
 Every image in `assets/` is generated from the original high-resolution art in
 `tools/source-art/` by a small Pillow pipeline. It snaps all sprites onto one shared pixel grid,
 repaints the raccoon on a curated palette, draws the store and its holiday decorations, and
-renders the merch mockups and print files.
+renders the merch mockups, print files, spec sheets and line sheet (checking every design
+against its production limits along the way).
 
 ```bash
 pip install pillow numpy

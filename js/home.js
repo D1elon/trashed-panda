@@ -1,11 +1,13 @@
 // Home page extras: cart badge in the nav and the holiday-drop teaser under the game.
 
-import { PRODUCTS, imageFor, formatPrice } from './shop/catalog.js';
-import { bindCartBadges } from './shared/cart.js';
+import { PRODUCTS, productById, imageFor, formatPrice } from './shop/catalog.js';
+import { cart, bindCartBadges } from './shared/cart.js';
 
+// Drop cart lines for products that no longer exist, so the badge count stays honest.
+for (const l of cart.lines) if (!productById(l.productId)) cart.remove(l.id);
 bindCartBadges();
 
-const FEATURED = ['ugly-sweater', 'pixel-ornament', 'naughty-list-tee', 'poor-life-choices-mug'];
+const FEATURED = ['ugly-sweater', 'naughty-list-tee', 'pixel-ornament'];
 const grid = document.getElementById('teaser-grid');
 if (grid) {
   grid.innerHTML = FEATURED.map((id) => PRODUCTS.find((p) => p.id === id))
@@ -14,7 +16,7 @@ if (grid) {
       const img = imageFor(p);
       return `
         <a class="card" href="shop/#p=${p.id}">
-          <span class="card__art" style="--art-bg:${img.bg}"><img src="${img.src}" width="128" height="128" alt="${p.name}" loading="lazy" /></span>
+          <span class="card__art" style="--art-bg:${img.bg}"><img src="${img.src}" width="160" height="160" alt="${p.name}" loading="lazy" /></span>
           <span class="card__body">
             <span class="card__name">${p.name}</span>
             <span class="card__meta"><span class="card__price">${formatPrice(p.price)}</span></span>

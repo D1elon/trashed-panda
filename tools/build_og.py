@@ -63,16 +63,16 @@ def og_home():
 
 
 def og_shop():
-    W, H = 300, 158
+    W, H = 400, 210                         # x3 = 1200 x 630
     im = Image.new('RGBA', (W, H), hexrgb('#1d3324'))
     d = ImageDraw.Draw(im)
-    d.rectangle((0, H - 30, W, H), fill=hexrgb('#2a1b11'))
-    d.line((0, H - 30, W, H - 30), fill=hexrgb('#4a3222'))
+    d.rectangle((0, H - 34, W, H), fill=hexrgb('#2a1b11'))
+    d.line((0, H - 34, W, H - 34), fill=hexrgb('#4a3222'))
     import random
     rnd = random.Random(5)
-    for _ in range(70):
-        im.putpixel((rnd.randrange(W), rnd.randrange(H - 30)), (244, 247, 251, 170))
-    for name, x, y in (('ornament-reserve.png', 2, 6), ('sweater-red.png', 86, 22), ('mug.png', 178, 34)):
+    for _ in range(110):
+        im.putpixel((rnd.randrange(W), rnd.randrange(H - 34)), (244, 247, 251, 170))
+    for name, x, y in (('ornament-reserve.png', -8, 14), ('mug-morning.png', 236, 34), ('sweater-red-front.png', 120, 30)):
         im.alpha_composite(Image.open(os.path.join(SHOP, name)).convert('RGBA'), (x, y))
     t = text8('THE HOLIDAY DROP', hexrgb('#fff4dc'))
     plate = Image.new('RGBA', (t.width + 10, t.height + 8), hexrgb('#d23a3a'))
@@ -82,8 +82,8 @@ def og_shop():
     url = 'TRASHEDPANDA.LOL/SHOP'
     u = Image.new('RGBA', (text3x5_width(url) + 8, 9), hexrgb('#f2a93b'))
     text3x5(u, 4, 2, url, hexrgb('#120c09'))
-    im.alpha_composite(u, ((W - u.width) // 2, H - 18))
-    upscale(im, 4).crop((0, 1, 1200, 631)).save(os.path.join(UI, 'og-shop.png'), optimize=True)
+    im.alpha_composite(u, ((W - u.width) // 2, H - 19))
+    upscale(im, 3).save(os.path.join(UI, 'og-shop.png'), optimize=True)
 
 
 if __name__ == '__main__':

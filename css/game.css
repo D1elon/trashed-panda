@@ -985,8 +985,9 @@
 }
 
 .merch-cta img {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
+  margin: -8px 0;
   flex: none;
   image-rendering: auto;
 }
@@ -1249,7 +1250,7 @@ body.is-touch.is-playing .stage {
 
 .teaser__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
 }
 
@@ -1267,6 +1268,9 @@ body.is-touch.is-playing .stage {
   .teaser__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
+  }
+  .teaser__grid > :nth-child(3) {
+    display: none;
   }
   .story__text h2,
   .teaser__head h2 {
