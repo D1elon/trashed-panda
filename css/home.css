@@ -266,10 +266,33 @@
   scroll-margin-top: calc(var(--nav-h) - 40px);
 }
 
+/* the bathroom art at 1x or 2x, never in between (cropped at the sides on narrow phones) */
+.story__art {
+  container-type: inline-size;
+  display: grid;
+  justify-items: center;
+  overflow: hidden;
+  padding-bottom: calc(var(--px) * 5);
+}
+
 .story__art img {
-  width: 100%;
-  height: auto;
+  width: 352px;
+  height: 184px;
+  max-width: none;
   box-shadow: var(--frame), 0 calc(var(--px) * 4) 0 rgba(0, 0, 0, 0.4);
+}
+
+@container (min-width: 704px) {
+  .story__art img {
+    width: 704px;
+    height: 368px;
+  }
+}
+
+@media (min-width: 1240px) {
+  .story {
+    grid-template-columns: 704px minmax(0, 1fr);
+  }
 }
 
 .story__text h2 {
