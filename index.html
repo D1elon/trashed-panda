@@ -4,12 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Trashed Panda: The Ashland Liquor Store Raccoon Game (Holiday Edition)</title>
-  <meta name="description" content="Play as the raccoon who fell through the ceiling of a Virginia liquor store, smashed the shelves and passed out in the bathroom. A 60-second pixel-art arcade game, now in a Santa hat." />
+  <meta name="description" content="Play as the raccoon who fell through the ceiling of a Virginia liquor store, smashed the shelves and passed out in the bathroom. A free 60-second pixel-art arcade game, now in a Santa hat." />
   <meta name="theme-color" content="#140d09" />
   <link rel="canonical" href="https://www.trashedpanda.lol/" />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Trashed Panda" />
   <meta property="og:title" content="Trashed Panda: Holiday Edition" />
@@ -20,15 +21,22 @@
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://www.trashedpanda.lol/assets/ui/og.png" />
+  <!-- the game used to live at /#play: send old links straight to its new page -->
+  <script>if (location.hash === '#play') location.replace('play/');</script>
   <link rel="preload" href="assets/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="assets/game/store.png" as="image" />
+  <link rel="preload" href="assets/ui/home-scene.png" as="image" />
+  <!-- warm the cache for the game page while visitors read -->
+  <link rel="prefetch" href="play/" />
+  <link rel="prefetch" href="css/game.css" />
+  <link rel="prefetch" href="js/game/main.js" />
+  <link rel="prefetch" href="assets/game/store.png" />
+  <link rel="prefetch" href="assets/game/bottles.png" />
   <link rel="stylesheet" href="css/site.css" />
-  <link rel="stylesheet" href="css/game.css" />
-  <script type="module" src="js/game/main.js"></script>
+  <link rel="stylesheet" href="css/home.css" />
   <script type="module" src="js/home.js"></script>
 </head>
 <body class="page-home">
-  <a class="skip-link" href="#play">Skip to the game</a>
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="nav" id="nav">
     <a class="nav__brand" href="./" aria-label="Trashed Panda home">
@@ -36,7 +44,7 @@
       <span>Trashed Panda</span>
     </a>
     <nav class="nav__links" aria-label="Main">
-      <a href="./#play" aria-current="page">Play</a>
+      <a href="play/">Play</a>
       <a href="shop/">Shop <span class="tag tag--red" data-when="open">Holiday drop</span><span class="tag tag--red" data-when="soon">Soon</span></a>
     </nav>
     <a class="nav__cart" href="shop/#cart" aria-label="Cart" data-when="open">
@@ -45,183 +53,36 @@
     </a>
   </header>
 
-  <main>
-    <section class="arcade" id="play" aria-label="Trashed Panda game">
-      <div class="stage" id="stage" tabindex="-1">
-        <canvas id="game" role="img" aria-label="Pixel-art liquor store. A raccoon in a Santa hat raids the shelves."></canvas>
-
-        <div class="hud" id="hud" hidden>
-          <div class="hud__left">
-            <div class="panel hud__box hud__score">
-              <span class="hud__label">Score</span>
-              <span class="hud__value" id="hud-score">0</span>
-            </div>
-            <div class="combo" id="hud-combo" hidden>
-              <span class="combo__text" id="hud-combo-text">Combo x1.5</span>
-              <span class="combo__bar"><i id="hud-combo-bar"></i></span>
-            </div>
-          </div>
-          <div class="panel hud__box hud__time" id="hud-time-box">
-            <span class="hud__label">Time</span>
-            <span class="hud__value" id="hud-time">60</span>
-            <span class="hud__bonus" id="hud-bonus" hidden>+5</span>
-          </div>
-          <div class="panel hud__box hud__buzz" id="hud-buzz-box">
-            <span class="hud__row">
-              <span class="hud__label">Buzz</span>
-              <span class="hud__tier" id="hud-tier">Sober <b>x1</b></span>
-            </span>
-            <span class="meter" id="hud-meter" role="meter" aria-label="Buzz" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
-          </div>
-          <button class="icon-btn hud__pause" id="btn-pause" type="button" aria-label="Pause">
-            <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-pause" /></svg>
-          </button>
+  <main id="main">
+    <section class="home-hero" aria-labelledby="home-title">
+      <canvas class="home-hero__snow" id="hero-snow" aria-hidden="true"></canvas>
+      <div class="home-hero__content">
+        <p class="home-hero__kicker">
+          <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-snow" /></svg>
+          Holiday Edition
+          <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-snow" /></svg>
+        </p>
+        <h1 class="home-hero__logo" id="home-title"><img src="assets/ui/logo.png" width="61" height="30" alt="Trashed Panda" /></h1>
+        <p class="home-hero__tag">One year ago a raccoon fell through the ceiling of the Ashland ABC store, smashed the shelves and passed out in the bathroom. <b>Your turn.</b></p>
+        <div class="home-hero__actions">
+          <a class="btn btn--primary btn--xl" href="play/">
+            <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-play" /></svg>
+            Play now
+          </a>
+          <a class="btn btn--lg" href="#story">The true story</a>
         </div>
-
-        <div class="countdown" id="countdown" aria-live="assertive"></div>
-        <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-
-        <!-- Title -->
-        <div class="screen screen--title" id="screen-title">
-          <button class="icon-btn screen__corner" id="btn-settings-title" type="button" aria-label="Settings">
-            <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-gear" /></svg>
-          </button>
-          <div class="title">
-            <p class="title__kicker">
-              <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-snow" /></svg>
-              Holiday Edition
-              <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-snow" /></svg>
-            </p>
-            <h1 class="title__logo"><img src="assets/ui/logo.png" width="61" height="30" alt="Trashed Panda" /></h1>
-            <p class="title__tag">One year ago a raccoon fell through the ceiling of the Ashland ABC store, smashed the shelves and passed out in the bathroom. <b>Your turn.</b></p>
-            <div class="title__actions">
-              <button class="btn btn--primary btn--xl" id="btn-play" type="button" disabled>Loading…</button>
-              <button class="btn" id="btn-help" type="button">How to play</button>
-            </div>
-            <p class="title__best" id="title-best" hidden>
-              <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-trophy" /></svg>
-              Best <b id="title-best-val">0</b>
-            </p>
-            <ul class="keys keys--title" aria-label="Keyboard controls">
-              <li><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-left" /></svg><span class="visually-hidden">Left</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-right" /></svg><span class="visually-hidden">Right</span></kbd> Move</li>
-              <li><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-up" /></svg><span class="visually-hidden">Up</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-down" /></svg><span class="visually-hidden">Down</span></kbd> Climb</li>
-              <li><kbd>Space</kbd> Swipe / Drink</li>
-              <li><kbd>P</kbd> Pause</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- How to play -->
-        <div class="screen screen--modal" id="screen-help" hidden>
-          <div class="panel modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="help-title">
-            <h2 class="modal__title" id="help-title">How to play</h2>
-            <ol class="rules">
-              <li><img src="assets/ui/help-swipe.png" alt="" width="40" height="34" /><p><b>Climb the shelves and swipe bottles off.</b> Smash them back to back for a combo, up to x3.</p></li>
-              <li><img src="assets/ui/help-drink.png" alt="" width="40" height="34" /><p><b>Drink the puddles.</b> The drunker you get, the more <em>every</em> point is worth, up to x3.</p></li>
-              <li><img src="assets/ui/help-buzz.png" alt="" width="40" height="34" /><p><b>Don’t hit 100% buzz.</b> You’ll black out for three seconds, and drunk climbing gets slippery.</p></li>
-              <li><img src="assets/ui/help-reserve.png" alt="" width="40" height="34" /><p><b>Smash the Holiday Reserve.</b> Two red bottles hide on the shelves. Each one adds five seconds.</p></li>
-            </ol>
-            <div class="controls-grid">
-              <div><h3>Keyboard</h3>
-                <ul class="keys">
-                  <li><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-left" /></svg><span class="visually-hidden">Left</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-right" /></svg><span class="visually-hidden">Right</span></kbd> or <kbd>A</kbd><kbd>D</kbd> Move</li>
-                  <li><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-up" /></svg><span class="visually-hidden">Up</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-down" /></svg><span class="visually-hidden">Down</span></kbd> or <kbd>W</kbd><kbd>S</kbd> Climb (hold to keep climbing)</li>
-                  <li><kbd>Space</kbd> or <kbd>E</kbd> Swipe / Drink</li>
-                  <li><kbd>P</kbd> or <kbd>Esc</kbd> Pause</li>
-                </ul>
-              </div>
-              <div><h3>Touch</h3>
-                <ul class="keys">
-                  <li>D-pad: move and climb</li>
-                  <li>Paw button: swipe on a shelf, drink on the floor</li>
-                </ul>
-              </div>
-            </div>
-            <button class="btn btn--primary" type="button" data-close>Got it</button>
-          </div>
-        </div>
-
-        <!-- Pause -->
-        <div class="screen screen--modal" id="screen-pause" hidden>
-          <div class="panel modal" role="dialog" aria-modal="true" aria-labelledby="pause-title">
-            <h2 class="modal__title" id="pause-title">Paused</h2>
-            <div class="stack">
-              <button class="btn btn--primary" id="btn-resume" type="button">Resume</button>
-              <button class="btn" id="btn-restart" type="button">Restart</button>
-              <button class="btn" id="btn-help-pause" type="button">How to play</button>
-              <button class="btn" id="btn-settings-pause" type="button">Settings</button>
-              <button class="btn btn--ghost" id="btn-quit" type="button">Quit to title</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Settings -->
-        <div class="screen screen--modal" id="screen-settings" hidden>
-          <div class="panel modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-            <h2 class="modal__title" id="settings-title">Settings</h2>
-            <div class="fields">
-              <label class="field"><span>Music</span><input type="range" min="0" max="100" step="5" id="set-music" /><output id="set-music-out">60</output></label>
-              <label class="field"><span>Sound FX</span><input type="range" min="0" max="100" step="5" id="set-sfx" /><output id="set-sfx-out">80</output></label>
-              <label class="toggle"><input type="checkbox" id="set-muted" /><i></i><span>Mute everything</span></label>
-              <label class="toggle"><input type="checkbox" id="set-shake" /><i></i><span>Screen shake</span></label>
-              <label class="toggle"><input type="checkbox" id="set-drunkfx" /><i></i><span>Drunk wobble &amp; double vision</span></label>
-              <label class="toggle"><input type="checkbox" id="set-santa" /><i></i><span>Santa hat</span></label>
-            </div>
-            <button class="btn btn--primary" type="button" data-close>Done</button>
-          </div>
-        </div>
-
-        <!-- Game over -->
-        <div class="screen screen--over" id="screen-over" hidden>
-          <div class="panel over" role="dialog" aria-modal="true" aria-labelledby="over-title">
-            <div class="over__scene" aria-hidden="true"><img src="assets/game/bathroom.png" alt="" width="352" height="184" /><span class="over__zzz">z<b>z</b><i>Z</i></span></div>
-            <p class="over__kicker">Found the next morning on the bathroom floor</p>
-            <h2 class="over__title" id="over-title">Passed out</h2>
-            <p class="over__rank" id="over-rank">Party Animal</p>
-            <div class="over__score"><span>Final score</span><b id="over-score">0</b></div>
-            <dl class="stats" id="over-stats"></dl>
-            <form class="name-entry" id="name-form" hidden>
-              <label for="name-input" class="name-entry__label">New high score! Sign the wall:</label>
-              <div class="name-entry__row">
-                <input id="name-input" name="name" maxlength="10" autocomplete="off" spellcheck="false" placeholder="BANDIT" />
-                <button class="btn btn--primary" type="submit">Save</button>
-              </div>
-            </form>
-            <div class="board-wrap">
-              <h3 class="board__title">Top bandits <small>on this device</small></h3>
-              <ol class="board" id="board"></ol>
-            </div>
-            <div class="over__actions">
-              <button class="btn btn--primary btn--lg" id="btn-again" type="button">Play again</button>
-              <button class="btn" id="btn-share" type="button">
-                <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-share" /></svg> Share
-              </button>
-            </div>
-            <a class="merch-cta" href="shop/">
-              <img src="assets/shop/sweater-red-front.png" alt="" width="80" height="80" />
-              <span data-when="open"><b>Wear the crime.</b> The holiday drop is live: ugly sweaters, ornaments &amp; more.</span>
-              <span data-when="soon"><b>Wear the crime.</b> The holiday drop is coming soon: ugly sweaters, ornaments &amp; more.</span>
-              <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-right" /></svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="loader" id="loader" aria-hidden="true"><span>Loading</span></div>
-        <noscript><div class="screen"><p class="noscript">Trashed Panda needs JavaScript to run.</p></div></noscript>
+        <ul class="home-hero__facts" aria-label="About the game">
+          <li>Free</li>
+          <li>60-second rounds</li>
+          <li>Phone or keyboard</li>
+        </ul>
+        <p class="home-hero__best" id="home-best" hidden>
+          <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-trophy" /></svg>
+          Your best <b id="home-best-val">0</b>
+        </p>
       </div>
-
-      <div class="touch" id="touch" hidden>
-        <div class="dpad" id="dpad" aria-label="Movement pad" role="group">
-          <span class="dpad__btn dpad__up"><svg class="ico"><use href="assets/ui/icons.svg#i-up" /></svg></span>
-          <span class="dpad__btn dpad__left"><svg class="ico"><use href="assets/ui/icons.svg#i-left" /></svg></span>
-          <span class="dpad__btn dpad__right"><svg class="ico"><use href="assets/ui/icons.svg#i-right" /></svg></span>
-          <span class="dpad__btn dpad__down"><svg class="ico"><use href="assets/ui/icons.svg#i-down" /></svg></span>
-          <span class="dpad__hub"></span>
-        </div>
-        <button class="abtn" id="abtn" type="button" aria-label="Swipe or drink">
-          <svg class="ico" aria-hidden="true"><use href="assets/ui/icons.svg#i-paw" /></svg>
-          <span id="abtn-label">Swipe</span>
-        </button>
+      <div class="home-hero__scene" aria-hidden="true">
+        <span class="home-hero__raccoon"></span>
       </div>
     </section>
 
@@ -234,7 +95,7 @@
         <h2 id="story-title">Thanksgiving weekend, 2025. Ashland, Virginia.</h2>
         <p>Sometime overnight, a raccoon dropped through a ceiling tile into the local ABC store. It knocked bottles off the shelves, sampled whatever hit the floor, and set off the alarm doing it.</p>
         <p>The next morning, Hanover County Animal Protection found the culprit passed out on the bathroom floor. They let it sleep it off and released it back into the wild with, as the shelter put it, <q>zero signs of injury, other than maybe a hangover and poor life choices.</q></p>
-        <p class="story__cta"><a class="btn btn--primary" href="#play">Relive the night</a></p>
+        <p class="story__cta"><a class="btn btn--primary" href="play/">Relive the night</a></p>
       </div>
     </section>
 
@@ -254,7 +115,7 @@
   <footer class="foot">
     <img src="assets/ui/raccoon-face.png" width="18" height="22" alt="" />
     <p>Trashed Panda is a fan-made game inspired by a true story. Not affiliated with Virginia ABC.</p>
-    <p>Made by <a href="https://github.com/D1elon" rel="noopener">D1elon</a> · <a href="shop/">Shop</a><span data-when="open"> · <a href="shop/#faq">Shipping &amp; returns</a></span></p>
+    <p>Made by <a href="https://github.com/D1elon" rel="noopener">D1elon</a> · <a href="play/">Play</a> · <a href="shop/">Shop</a><span data-when="open"> · <a href="shop/#faq">Shipping &amp; returns</a></span></p>
   </footer>
 </body>
 </html>

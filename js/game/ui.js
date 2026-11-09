@@ -42,6 +42,8 @@ export class UI {
   openModal(id) {
     const el = this.screens[id];
     this.modalStack.push({ id, returnFocus: document.activeElement });
+    // stack in opening order: How to play / Settings opened from Pause must sit above it
+    el.style.zIndex = String(40 + this.modalStack.length);
     el.hidden = false;
     const first = el.querySelector('[data-close], button, input');
     requestAnimationFrame(() => (el.querySelector('.btn--primary') || first)?.focus({ preventScroll: true }));
@@ -51,6 +53,7 @@ export class UI {
     const top = this.modalStack.pop();
     if (!top) return false;
     this.screens[top.id].hidden = true;
+    this.screens[top.id].style.zIndex = '';
     top.returnFocus?.focus?.({ preventScroll: true });
     return true;
   }
@@ -141,8 +144,9 @@ export class UI {
 
   onPhase(p) {
     const playing = p === 'dropping' || p === 'ready' || p === 'playing' || p === 'paused' || p === 'ending';
-    this.hud.hidden = !(p === 'ready' || p === 'playing' || p === 'paused' || p === 'ending');
+    this.hud.hidden = !playing;
     document.body.classList.toggle('is-playing', playing);
+    document.body.classList.toggle('is-paused', p === 'paused');
     if (p === 'title') {
       this.show('screen-title');
       this.hide('screen-over');
@@ -263,7 +267,10 @@ export class UI {
   showResults(r) {
     this.results = r;
     this.saved = null;
+    const prevBest = store.bestScore();
+    $('over-pb').hidden = !(prevBest !== null && r.score > prevBest);
     this.show('screen-over');
+    this.screens['screen-over'].scrollTop = 0;
     $('over-rank').textContent = r.rank;
     $('over-title').textContent = r.blackouts > 0 && r.score < 600 ? 'Blacked out' : 'Passed out';
     const stats = [
@@ -315,12 +322,14 @@ export class UI {
     const { entry } = store.submitScore({ name, score: r.score, broken: r.broken, bestCombo: r.bestCombo });
     store.rememberName(name);
     this.saved = entry;
+    input.blur();
     $('name-form').hidden = true;
     this.renderBoard();
     this.refreshBest();
     $('btn-again').focus({ preventScroll: true });
   }
 
+  /** Top five, plus the entry just saved if it landed lower down. */
   renderBoard() {
     const board = store.loadBoard();
     const ol = $('board');
@@ -328,18 +337,19 @@ export class UI {
       ol.innerHTML = '<li class="board__empty">No scores yet. Be the first.</li>';
       return;
     }
-    ol.innerHTML = board
-      .map((e, i) => {
-        const me = this.saved && e.date === this.saved.date && e.score === this.saved.score;
-        return `<li class="${me ? 'is-me' : ''}"><span class="board__rank">${i + 1}</span><span class="board__name">${escapeHtml(e.name)}</span><span class="board__score">${e.score.toLocaleString()}</span></li>`;
-      })
-      .join('');
+    const isMe = (e) => this.saved && e.date === this.saved.date && e.score === this.saved.score;
+    const row = (e, i) =>
+      `<li class="${isMe(e) ? 'is-me' : ''}"><span class="board__rank">${i + 1}</span><span class="board__name">${escapeHtml(e.name)}</span><span class="board__score">${e.score.toLocaleString()}</span></li>`;
+    const rows = board.slice(0, 5).map(row);
+    const mine = board.findIndex(isMe);
+    if (mine >= 5) rows.push(`<li class="board__gap" aria-hidden="true">···</li>`, row(board[mine], mine));
+    ol.innerHTML = rows.join('');
   }
 
   async share() {
     const r = this.results;
     if (!r) return;
-    const url = 'https://www.trashedpanda.lol/';
+    const url = 'https://www.trashedpanda.lol/play/';
     const text = `I scored ${r.score.toLocaleString()} as the Ashland liquor store raccoon (${r.rank}). Can you beat it?`;
     try {
       if (navigator.share) {

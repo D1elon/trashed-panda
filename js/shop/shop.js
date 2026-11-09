@@ -3,6 +3,7 @@
 import { STORE, PRODUCTS, CATEGORIES, productById, defaultOptions, visualOption, imageFor, viewsFor, variantLabel, formatPrice } from './catalog.js';
 import { cart, bindCartBadges, lineKey } from '../shared/cart.js';
 import { shopOpen, applyShopState } from '../shared/launch.js';
+import { pixelSnow } from '../shared/snow.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const ICONS = new URL('../../assets/ui/icons.svg', import.meta.url).href;
@@ -291,45 +292,6 @@ notice.addEventListener('click', (e) => {
   if (e.target === notice || e.target.closest('[data-close]')) notice.close();
 });
 
-// ---------------------------------------------------------------- hero snow
-function heroSnow() {
-  const c = $('#hero-snow');
-  if (!c || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const g = c.getContext('2d');
-  const flakes = [];
-  let w = 0;
-  let h = 0;
-  const px = 4;
-  const resize = () => {
-    const r = c.getBoundingClientRect();
-    w = Math.ceil(r.width / px);
-    h = Math.ceil(r.height / px);
-    c.width = w;
-    c.height = h;
-  };
-  new ResizeObserver(resize).observe(c);
-  resize();
-  for (let i = 0; i < 46; i++) flakes.push({ x: Math.random() * 400, y: Math.random() * 200, v: 4 + Math.random() * 7, p: Math.random() * 6 });
-  let last = performance.now();
-  const tick = (now) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    g.clearRect(0, 0, w, h);
-    g.fillStyle = 'rgba(244, 247, 251, 0.85)';
-    for (const f of flakes) {
-      f.y += f.v * dt;
-      f.p += dt * 1.6;
-      if (f.y > h) {
-        f.y = -1;
-        f.x = Math.random() * w;
-      }
-      g.fillRect(Math.round((f.x + Math.sin(f.p) * 2) % w), Math.round(f.y), 1, 1);
-    }
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
-
 // ---------------------------------------------------------------- toast
 let toastT;
 function toast(msg) {
@@ -358,7 +320,7 @@ function boot() {
     // Coming soon: hero + promise only. Old product or cart links land on the teaser.
     if (location.hash.startsWith('#p=') || location.hash === '#cart') history.replaceState(null, '', location.pathname + location.search);
     document.title = 'Coming Soon · Trashed Panda Holiday Shop';
-    heroSnow();
+    pixelSnow($('#hero-snow'));
     return;
   }
   renderChips();
@@ -391,7 +353,7 @@ function boot() {
   }
   window.addEventListener('hashchange', route);
   route();
-  heroSnow();
+  pixelSnow($('#hero-snow'));
   window.__shop = { cart, toast };
 }
 

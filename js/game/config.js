@@ -19,6 +19,7 @@ export const MAX_FALL_SPEED = 420;
 export const EDGE_MARGIN = 6;           // how far inside a shelf the raccoon's centre must stay
 
 // Actions
+export const INPUT_BUFFER = 0.18;       // a press this early (mid-climb, on cooldown) still lands
 export const SWIPE_TIME = 0.28;
 export const SWIPE_COOLDOWN = 0.2;
 export const SWIPE_REACH = 14;          // hit window centre, ahead of the raccoon's centre

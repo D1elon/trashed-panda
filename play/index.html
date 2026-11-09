@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en" class="is-game">
+<head>
+  <meta charset="utf-8" />
+  <!-- A game screen, not a document: no pinch or double-tap zoom on this page (see css/game.css) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Play Trashed Panda · Holiday Edition</title>
+  <meta name="description" content="Play the 60-second pixel-art arcade game: climb the shelves, smash bottles, drink the puddles and don’t black out. Based on the true story of the Ashland, VA liquor store raccoon." />
+  <meta name="theme-color" content="#0a0605" />
+  <link rel="canonical" href="https://www.trashedpanda.lol/play/" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Trashed Panda" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Trashed Panda" />
+  <meta property="og:title" content="Play Trashed Panda: Holiday Edition" />
+  <meta property="og:description" content="One raccoon. One liquor store. Sixty seconds. Can you beat my score?" />
+  <meta property="og:url" content="https://www.trashedpanda.lol/play/" />
+  <meta property="og:image" content="https://www.trashedpanda.lol/assets/ui/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://www.trashedpanda.lol/assets/ui/og.png" />
+  <link rel="preload" href="../assets/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../assets/game/store.png" as="image" />
+  <link rel="preload" href="../assets/game/raccoon.png" as="image" />
+  <link rel="preload" href="../assets/game/bottles.png" as="image" />
+  <link rel="stylesheet" href="../css/site.css" />
+  <link rel="stylesheet" href="../css/game.css" />
+  <script type="module" src="../js/game/main.js"></script>
+  <script type="module" src="../js/play.js"></script>
+</head>
+<body class="page-play">
+  <a class="skip-link" href="#stage">Skip to the game</a>
+
+  <header class="nav" id="nav">
+    <a class="nav__brand" href="../" aria-label="Trashed Panda home">
+      <img src="../assets/ui/raccoon-face.png" width="18" height="22" alt="" />
+      <span>Trashed Panda</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="./" aria-current="page">Play</a>
+      <a href="../shop/">Shop <span class="tag tag--red" data-when="open">Holiday drop</span><span class="tag tag--red" data-when="soon">Soon</span></a>
+    </nav>
+    <a class="nav__cart" href="../shop/#cart" aria-label="Cart" data-when="open">
+      <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-cart" /></svg>
+      <span class="nav__count" data-cart-count hidden>0</span>
+    </a>
+  </header>
+
+  <main class="arcade" id="play" aria-label="Trashed Panda game">
+    <div class="stage" id="stage" tabindex="-1">
+      <canvas id="game" role="img" aria-label="Pixel-art liquor store. A raccoon in a Santa hat raids the shelves."></canvas>
+
+      <div class="hud" id="hud" hidden>
+        <div class="hud__left">
+          <div class="panel hud__box hud__score">
+            <span class="hud__label">Score</span>
+            <span class="hud__value" id="hud-score">0</span>
+          </div>
+          <div class="combo" id="hud-combo" hidden>
+            <span class="combo__text" id="hud-combo-text">Combo x1.5</span>
+            <span class="combo__bar"><i id="hud-combo-bar"></i></span>
+          </div>
+        </div>
+        <div class="panel hud__box hud__time" id="hud-time-box">
+          <span class="hud__label">Time</span>
+          <span class="hud__value" id="hud-time">60</span>
+          <span class="hud__bonus" id="hud-bonus" hidden>+5</span>
+        </div>
+        <div class="panel hud__box hud__buzz" id="hud-buzz-box">
+          <span class="hud__row">
+            <span class="hud__label">Buzz</span>
+            <span class="hud__tier" id="hud-tier">Sober <b>x1</b></span>
+          </span>
+          <span class="meter" id="hud-meter" role="meter" aria-label="Buzz" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
+        </div>
+        <button class="icon-btn hud__pause" id="btn-pause" type="button" aria-label="Pause">
+          <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-pause" /></svg>
+        </button>
+      </div>
+
+      <div class="countdown" id="countdown" aria-live="assertive"></div>
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+      <!-- Title -->
+      <div class="screen screen--title" id="screen-title">
+        <a class="icon-btn screen__corner screen__corner--home" href="../" aria-label="Trashed Panda home">
+          <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-home" /></svg>
+        </a>
+        <div class="screen__corner screen__corner--tools">
+          <button class="icon-btn" id="btn-fullscreen-title" type="button" aria-label="Full screen" hidden>
+            <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-fullscreen" /></svg>
+          </button>
+          <button class="icon-btn" id="btn-settings-title" type="button" aria-label="Settings">
+            <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-gear" /></svg>
+          </button>
+        </div>
+        <div class="title">
+          <p class="title__kicker">
+            <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-snow" /></svg>
+            Holiday Edition
+            <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-snow" /></svg>
+          </p>
+          <h1 class="title__logo"><img src="../assets/ui/logo.png" width="61" height="30" alt="Trashed Panda" /></h1>
+          <p class="title__tag">One year ago a raccoon fell through the ceiling of the Ashland ABC store, smashed the shelves and passed out in the bathroom. <b>Your turn.</b></p>
+          <div class="title__actions">
+            <button class="btn btn--primary btn--xl" id="btn-play" type="button" disabled>Loading…</button>
+            <button class="btn" id="btn-help" type="button">How to play</button>
+          </div>
+          <p class="title__best" id="title-best" hidden>
+            <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-trophy" /></svg>
+            Best <b id="title-best-val">0</b>
+          </p>
+          <ul class="keys keys--title" aria-label="Keyboard controls">
+            <li><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-left" /></svg><span class="visually-hidden">Left</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-right" /></svg><span class="visually-hidden">Right</span></kbd> Move</li>
+            <li><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-up" /></svg><span class="visually-hidden">Up</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-down" /></svg><span class="visually-hidden">Down</span></kbd> Climb</li>
+            <li><kbd>Space</kbd> Swipe / Drink</li>
+            <li><kbd>P</kbd> Pause</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- How to play -->
+      <div class="screen screen--modal" id="screen-help" hidden>
+        <div class="panel modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="help-title">
+          <h2 class="modal__title" id="help-title">How to play</h2>
+          <ol class="rules">
+            <li><img src="../assets/ui/help-swipe.png" alt="" width="40" height="34" /><p><b>Climb the shelves and swipe bottles off.</b> Smash them back to back for a combo, up to x3.</p></li>
+            <li><img src="../assets/ui/help-drink.png" alt="" width="40" height="34" /><p><b>Drink the puddles.</b> The drunker you get, the more <em>every</em> point is worth, up to x3.</p></li>
+            <li><img src="../assets/ui/help-buzz.png" alt="" width="40" height="34" /><p><b>Don’t hit 100% buzz.</b> You’ll black out for three seconds, and drunk climbing gets slippery.</p></li>
+            <li><img src="../assets/ui/help-reserve.png" alt="" width="40" height="34" /><p><b>Smash the Holiday Reserve.</b> Two red bottles hide on the shelves. Each one adds five seconds.</p></li>
+          </ol>
+          <div class="controls-grid">
+            <div class="controls-grid__keys"><h3>Keyboard</h3>
+              <ul class="keys">
+                <li><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-left" /></svg><span class="visually-hidden">Left</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-right" /></svg><span class="visually-hidden">Right</span></kbd> or <kbd>A</kbd><kbd>D</kbd> Move</li>
+                <li><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-up" /></svg><span class="visually-hidden">Up</span></kbd><kbd><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-down" /></svg><span class="visually-hidden">Down</span></kbd> or <kbd>W</kbd><kbd>S</kbd> Climb (hold to keep climbing)</li>
+                <li><kbd>Space</kbd> or <kbd>E</kbd> Swipe / Drink</li>
+                <li><kbd>P</kbd> or <kbd>Esc</kbd> Pause · <kbd>M</kbd> Mute · <kbd>F</kbd> Full screen</li>
+              </ul>
+            </div>
+            <div class="controls-grid__touch"><h3>Touch</h3>
+              <ul class="keys">
+                <li>Left thumb: move and climb. Anywhere around the pad works.</li>
+                <li>Right thumb: the paw swipes on a shelf and drinks on the floor.</li>
+              </ul>
+            </div>
+          </div>
+          <button class="btn btn--primary" type="button" data-close>Got it</button>
+        </div>
+      </div>
+
+      <!-- Pause -->
+      <div class="screen screen--modal" id="screen-pause" hidden>
+        <div class="panel modal" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+          <h2 class="modal__title" id="pause-title">Paused</h2>
+          <div class="stack">
+            <button class="btn btn--primary" id="btn-resume" type="button">Resume</button>
+            <button class="btn" id="btn-restart" type="button">Restart</button>
+            <button class="btn" id="btn-help-pause" type="button">How to play</button>
+            <button class="btn" id="btn-settings-pause" type="button">Settings</button>
+            <button class="btn btn--ghost" id="btn-quit" type="button">Quit to title</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="screen screen--modal" id="screen-settings" hidden>
+        <div class="panel modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+          <h2 class="modal__title" id="settings-title">Settings</h2>
+          <div class="fields">
+            <label class="field"><span>Music</span><input type="range" min="0" max="100" step="5" id="set-music" /><output id="set-music-out">60</output></label>
+            <label class="field"><span>Sound FX</span><input type="range" min="0" max="100" step="5" id="set-sfx" /><output id="set-sfx-out">80</output></label>
+            <label class="toggle"><input type="checkbox" id="set-muted" /><i></i><span>Mute everything</span></label>
+            <label class="toggle"><input type="checkbox" id="set-shake" /><i></i><span>Screen shake</span></label>
+            <label class="toggle"><input type="checkbox" id="set-drunkfx" /><i></i><span>Drunk wobble &amp; double vision</span></label>
+            <label class="toggle"><input type="checkbox" id="set-santa" /><i></i><span>Santa hat</span></label>
+          </div>
+          <button class="btn btn--primary" type="button" data-close>Done</button>
+        </div>
+      </div>
+
+      <!-- Game over -->
+      <div class="screen screen--over" id="screen-over" hidden>
+        <div class="panel over" role="dialog" aria-modal="true" aria-labelledby="over-title">
+          <div class="over__main">
+            <div class="over__scene" aria-hidden="true"><div class="over__art"><img src="../assets/game/bathroom.png" alt="" width="352" height="184" /><span class="over__zzz">z<b>z</b><i>Z</i></span></div></div>
+            <p class="over__kicker">Found the next morning on the bathroom floor</p>
+            <h2 class="over__title" id="over-title">Passed out</h2>
+            <p class="over__rank" id="over-rank">Party Animal</p>
+            <div class="over__score">
+              <span>Final score</span>
+              <b id="over-score">0</b>
+              <em class="over__pb" id="over-pb" hidden>New personal best!</em>
+            </div>
+            <form class="name-entry" id="name-form" hidden>
+              <label for="name-input" class="name-entry__label">Top 10! Sign the wall:</label>
+              <div class="name-entry__row">
+                <input id="name-input" name="name" maxlength="10" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done" placeholder="BANDIT" />
+                <button class="btn btn--primary" type="submit">Save</button>
+              </div>
+            </form>
+            <div class="over__actions">
+              <button class="btn btn--primary btn--lg" id="btn-again" type="button">Play again</button>
+              <button class="btn" id="btn-share" type="button">
+                <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-share" /></svg> Share
+              </button>
+            </div>
+          </div>
+          <div class="over__side">
+            <dl class="stats" id="over-stats"></dl>
+            <div class="board-wrap">
+              <h3 class="board__title">Top bandits <small>on this device</small></h3>
+              <ol class="board" id="board"></ol>
+            </div>
+            <a class="merch-cta" href="../shop/">
+              <img src="../assets/shop/sweater-red-front.png" alt="" width="80" height="80" />
+              <span data-when="open"><b>Wear the crime.</b> The holiday drop is live: ugly sweaters, ornaments &amp; more.</span>
+              <span data-when="soon"><b>Wear the crime.</b> The holiday drop is coming soon: ugly sweaters, ornaments &amp; more.</span>
+              <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-right" /></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="loader" id="loader" aria-hidden="true"><span>Loading</span></div>
+      <noscript><div class="screen"><p class="noscript">Trashed Panda needs JavaScript to run.</p></div></noscript>
+    </div>
+
+    <!-- On-screen controls. Each zone is much bigger than the art inside it, so a thumb
+         that lands near (not exactly on) the pad or the paw still counts. -->
+    <div class="touch" id="touch" hidden>
+      <div class="touch__zone touch__zone--move" id="move-zone">
+        <div class="dpad" id="dpad" role="group" aria-label="Movement pad">
+          <span class="dpad__btn dpad__up"><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-up" /></svg></span>
+          <span class="dpad__btn dpad__left"><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-left" /></svg></span>
+          <span class="dpad__btn dpad__right"><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-right" /></svg></span>
+          <span class="dpad__btn dpad__down"><svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-down" /></svg></span>
+          <span class="dpad__hub"></span>
+        </div>
+      </div>
+      <div class="touch__zone touch__zone--act" id="act-zone">
+        <button class="abtn" id="abtn" type="button" tabindex="-1" aria-label="Swipe or drink">
+          <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-paw" /></svg>
+          <span id="abtn-label">Swipe</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

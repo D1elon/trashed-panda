@@ -9,7 +9,8 @@ This is the **Holiday Edition**, with a merch shop.
 
 | | |
 | --- | --- |
-| `index.html` | The game, plus the true story and a teaser for the holiday drop |
+| `index.html` | Home page: hero, the true story and a teaser for the holiday drop |
+| `play/` | The game, on its own full-screen page (no scrolling or zooming on phones, installable to the home screen via `manifest.webmanifest`) |
 | `shop/` | The holiday merch store, currently in coming-soon mode (see [docs/SHOP_SETUP.md](docs/SHOP_SETUP.md) to preview it and take orders) |
 | `js/game/` | Game engine: simulation, canvas renderer, synthesized audio, input, UI |
 | `js/shop/` | Store catalog (`catalog.js`) and storefront logic |
@@ -29,7 +30,7 @@ ES modules need a web server (opening the file directly won't work):
 python3 -m http.server 8000
 ```
 
-Then visit <http://localhost:8000>.
+Then visit <http://localhost:8000> (the game itself is at <http://localhost:8000/play/>).
 
 ## How to play
 
@@ -39,13 +40,17 @@ Then visit <http://localhost:8000>.
 * Drinking raises your **buzz**, which multiplies every point (up to x3). Hit 100% and you
   black out for three seconds.
 * Smash a **Holiday Reserve** bottle for +5 seconds. Emptied shelves restock.
-* On phones: D-pad plus a context-sensitive paw button.
+* On phones: D-pad plus a context-sensitive paw button. Each sits in a large touch zone,
+  so a thumb that lands near (not exactly on) a button still counts. Portrait play uses a
+  HUD strip on top and the controls on a strip below, so nothing covers the shelves.
+* **P** or **Esc** pauses, **M** mutes, **F** goes full screen.
 
 ## Regenerating the art
 
 Every image in `assets/` is generated from the original high-resolution art in
 `tools/source-art/` by a small Pillow pipeline. It snaps all sprites onto one shared pixel grid,
-repaints the raccoon on a curated palette, draws the store and its holiday decorations, and
+repaints the raccoon on a curated palette, draws the store and its holiday decorations (plus a
+stocked, lit version for the home page), and
 renders the merch mockups, print files, spec sheets and line sheet (checking every design
 against its production limits along the way).
 
