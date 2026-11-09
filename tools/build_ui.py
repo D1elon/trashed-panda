@@ -70,27 +70,32 @@ def icon_svg():
         fh.write('\n'.join(out) + '\n')
 
 
-# Hand-drawn front-facing raccoon head: the brand mark (favicon, nav, share image).
+# Hand-drawn front-facing raccoon head: the brand mark (favicon, nav, share image, merch).
+# The in-game front face (tools/build_sprites.py HEAD_FRONT) at brand-mark size, so it
+# matches the side view too: tan-rimmed ears, crown highlight and centre stripe, a cream
+# brow, dark mask patches wrapping the eyes with a cream ring under them, cream muzzle,
+# dark nose, tan cheeks; both eyes are the profile's eye, glancing the same way.
+#   K outline  D mask  N shadow fur  F fur  H highlight  L tan  W cream  E pupil  G glint
 FACE = [
     '.KK............KK.',
-    'KLFK..........KFLK',
-    'KLFFKKKKKKKKKKFFLK',
-    '.KFFFFFHHHHFFFFFK.',
-    'KFFFFFFFHHFFFFFFFK',
-    'KFWWWWFFFFFFWWWWFK',
-    'KDDDDDDWFFWDDDDDDK',
-    'KDDSGEDDWWDDGESDDK',
-    'KDDSEEDDWWDDEESDDK',
-    '.KDDDDWWWWWWDDDDK.',
-    '.KWWWWWWWWWWWWWWK.',
-    '..KWWWWKKKKWWWWK..',
-    '...KWWWWKKWWWWK...',
-    '....KKWWWWWWKK....',
-    '......KKKKKK......',
+    'KLDK..........KDLK',
+    'KLDNKKKKKKKKKKNDLK',
+    'KFNFFHHHNNHHHFFNFK',
+    'KFFFFFFHNNHFFFFFFK',
+    'KWWWWWWFNNFWWWWWWK',
+    'KDDDDEEDNNDDEEDDDK',
+    'KDDDWEGDNNDWEGDDDK',
+    'KDDDWEEDWWDWEEDDDK',
+    'KWDDDDDWWWWDDDDDWK',
+    '.KWWDDWWWWWWDDWWK.',
+    '.KLWWWWKKKKWWWWLK.',
+    '..KLWWWWKKWWWWLK..',
+    '...KLLWWWWWWLLK...',
+    '....KKKKKKKKKK....',
 ]
 FACE_PAL = {
-    'K': '#1a120c', 'D': '#402d20', 'F': '#76643c', 'H': '#8d7a50', 'L': '#b29c72',
-    'W': '#ece2cc', 'S': '#ece2cc', 'E': '#0b0705', 'G': '#fffcf4',
+    'K': '#1a120c', 'D': '#402d20', 'N': '#62502f', 'F': '#76643c', 'H': '#8d7a50', 'L': '#b29c72',
+    'W': '#ece2cc', 'E': '#0b0705', 'G': '#fffcf4',
 }
 HAT = [
     '..KKK..........',
