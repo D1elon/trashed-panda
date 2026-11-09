@@ -25,7 +25,7 @@ SEASON = 2026          # printed on the ornament back; bump each year (the story
 # ---------------------------------------------------------------------------
 # Textile face: the brand face reduced to roles for knit / embroidery
 # ---------------------------------------------------------------------------
-FACE_ROLE = {'K': 'dark', 'D': 'dark', 'E': 'dark', 'F': 'fur', 'H': 'fur', 'L': 'light', 'W': 'light', 'S': 'light', 'G': 'light'}
+FACE_ROLE = {'K': 'dark', 'D': 'dark', 'E': 'dark', 'N': 'fur', 'F': 'fur', 'H': 'fur', 'L': 'light', 'W': 'light', 'S': 'light', 'G': 'light'}
 HAT_ROLE = {'K': 'dark', 'R': 'hat', 'r': 'hat', 'h': 'hat', 'W': 'light', 'w': 'light'}
 
 

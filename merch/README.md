@@ -57,7 +57,7 @@ so if a template differs, keep the artwork centred at the stated width and scale
 | Sweater green back: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
 | Sweater green sleeve: yarn colours | pass | 3 of 4 allowed |
 | Sweater green sleeve: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
-| Tee black-garment file: near-black ink knocked out | pass | 78 px removed before scaling |
+| Tee black-garment file: near-black ink knocked out | pass | 84 px removed before scaling |
 | Ornament drop: artwork inside 2.6 in safe circle | pass | 0 px outside |
 | Ornament reserve: artwork inside 2.6 in safe circle | pass | 0 px outside |
 | Ornament passed-out: artwork inside 2.6 in safe circle | pass | 0 px outside |
