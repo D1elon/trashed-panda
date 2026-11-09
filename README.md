@@ -50,7 +50,7 @@ Then visit <http://localhost:8000> (the game itself is at <http://localhost:8000
 Every image in `assets/` is generated from the original high-resolution art in
 `tools/source-art/` by a small Pillow pipeline. It snaps all sprites onto one shared pixel grid,
 repaints the raccoon on a curated palette, draws the store and its holiday decorations (plus a
-stocked, lit version for the home page), and
+stocked, lit version for the home page) and the passed-out restroom scene, and
 renders the merch mockups, print files, spec sheets and line sheet (checking every design
 against its production limits along the way).
 
