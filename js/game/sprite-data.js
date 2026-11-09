@@ -123,37 +123,37 @@ export const SPRITES = {
    },
    {
     "row": "swipe",
-    "headX": 41.0,
+    "headX": 40.5,
     "headTop": 8,
     "feet": 61
    },
    {
     "row": "swipe",
-    "headX": 41.0,
+    "headX": 40.5,
     "headTop": 8,
     "feet": 61
    },
    {
     "row": "swipe",
-    "headX": 41.0,
+    "headX": 40.5,
     "headTop": 8,
     "feet": 61
    },
    {
     "row": "swipe",
-    "headX": 41.0,
+    "headX": 40.5,
     "headTop": 8,
     "feet": 61
    },
    {
     "row": "swipe",
-    "headX": 41.0,
+    "headX": 40.5,
     "headTop": 8,
     "feet": 61
    },
    {
     "row": "swipe",
-    "headX": 41.0,
+    "headX": 40.5,
     "headTop": 8,
     "feet": 61
    }
@@ -186,9 +186,5 @@ export const SPRITES = {
    25,
    34
   ]
- },
- "bathroom": {
-  "w": 352,
-  "h": 184
  }
 };

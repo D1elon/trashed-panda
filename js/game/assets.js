@@ -68,12 +68,11 @@ function measureFeet(img, cw, ch) {
 }
 
 export async function loadAssets() {
-  const [raccoon, bottles, store, tile, bathroom] = await Promise.all([
+  const [raccoon, bottles, store, tile] = await Promise.all([
     loadImage('raccoon.png'),
     loadImage('bottles.png'),
     loadImage('store.png'),
     loadImage('ceiling-tile.png'),
-    loadImage('bathroom.png'),
   ]);
   const R = SPRITES.raccoon;
   return {
@@ -83,7 +82,6 @@ export async function loadAssets() {
     bottles,
     store,
     tile,
-    bathroom,
   };
 }
 
