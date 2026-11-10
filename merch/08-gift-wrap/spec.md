@@ -4,7 +4,7 @@
 
 ## Design
 
-Santa Panda faces, gold bottles and snowflakes on festive red, in a seamless brick repeat so every fold lines up.
+Santa Panda faces, gold bottles and snowflakes on deep pine green, in a seamless brick repeat so every fold lines up.
 
 ## Production
 
@@ -24,7 +24,7 @@ Santa Panda faces, gold bottles and snowflakes on festive red, in a seamless bri
 
 | File | Pixels | Notes |
 | --- | --- | --- |
-| `seamless-tile-150dpi.png` | 576 x 576 | Repeat tile, 3.84 in at 150 dpi. |
+| `seamless-tile-150dpi.png` | 720 x 768 | Repeat tile, 4.80 x 5.12 in at 150 dpi. |
 | `sheet-20x30in-150dpi.png` | 3000 x 4500 | Full sheet, ready to upload as-is. |
 
 ### Notes

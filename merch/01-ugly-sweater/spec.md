@@ -4,7 +4,7 @@
 
 ## Design
 
-A real fair-isle chart: a yoke of trees and stars, the Santa Panda framed by snowflakes and bottles over the words HOLIDAY SPIRITS (the sale poster pun from the game), a bottle hem band, TRASHED PANDA across the back, and sleeves ringed like a raccoon tail.
+One big face: the game's own raccoon head knitted at two stitches per pixel across the chest, in real raccoon colours (charcoal mask, grey fur, cream brows and muzzle), wearing a Santa hat in the sweater's own colour. A ringed-tail band runs across the yoke, TRASHED PANDA sits on the back, and both sleeves are ringed charcoal and grey exactly like the tail.
 
 ## Production
 
@@ -43,17 +43,17 @@ A real fair-isle chart: a yoke of trees and stars, the Santa Panda framed by sno
 
 ### Yarn colours (4 per colourway)
 
-| Colourway | Base | Cream | Dark brown | Accent |
+| Colourway | Base | Cream | Charcoal | Fur grey |
 | --- | --- | --- | --- | --- |
-| Red | `#b3262e` | `#efe6d2` | `#2e2019` | `#24553a` |
-| Green | `#24553a` | `#efe6d2` | `#2e2019` | `#b3262e` |
+| Red | `#b3262e` | `#efe6d2` | `#2b2522` | `#8d8578` |
+| Green | `#24553a` | `#efe6d2` | `#2b2522` | `#8d8578` |
 
-Pick the nearest of Printful's yarn colours to each hex. Base, collar and hem must be among the 4; the charts already use dark brown for the hem band so collar/cuffs/hem can all be dark brown.
+Pick the nearest of Printful's yarn colours to each hex. Base, collar and hem must be among the 4; the charts already use charcoal for the hem band and cuffs, so collar/cuffs/hem can all be charcoal.
 
 ### Notes
 
 - Upload each chart in the knitwear Design Maker with **Pixelated** rendering, so every cell becomes one block of stitches.
-- Charts are drawn so the accent colour never sits directly next to the base colour (red/green blur together at stitch level); the build checks this.
+- Charts are drawn so the fur grey never sits directly next to the base colour (a mid grey blurs into red or green at stitch level): it is always fenced in by charcoal. The build checks this.
 - If the template's panel is larger than the chart, scale the chart up evenly and fill the remaining area with the base colour or the all-over tile.
 
 ### Before you publish

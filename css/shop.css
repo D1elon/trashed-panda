@@ -805,8 +805,8 @@ dialog[open] {
 }
 
 .empty img {
-  width: 152px;
-  height: 74px;
+  width: 146px;
+  height: 64px;
 }
 
 .empty p {
@@ -835,7 +835,7 @@ dialog[open] {
 
 .notice__inner img {
   width: 54px;
-  height: 66px;
+  height: 63px;
 }
 
 .notice__inner h2 {

@@ -11,8 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(__file__))
 from pixlib import hexrgb, upscale, text3x5, text3x5_width  # noqa: E402
-from build_ui import raccoon_face  # noqa: E402
-from build_sprites import art, HAT_SIDE, HAT_PAL as HAT_SIDE_PAL  # noqa: E402
+import raccoon as R  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 GAME = os.path.join(ROOT, 'assets', 'game')
@@ -176,13 +175,7 @@ def centered(img, cx, y):
 # ---------------------------------------------------------------------------
 # source art from the game
 # ---------------------------------------------------------------------------
-_RAC = Image.open(os.path.join(GAME, 'raccoon.png')).convert('RGBA')
 _BOT = Image.open(os.path.join(GAME, 'bottles.png')).convert('RGBA')
-
-
-def rac(col, row):
-    f = _RAC.crop((col * 80, row * 66, col * 80 + 80, row * 66 + 66))
-    return f.crop(f.getbbox())
 
 
 def bottle(kind_row, col=0):
@@ -190,23 +183,23 @@ def bottle(kind_row, col=0):
     return f.crop(f.getbbox())
 
 
-FACE = raccoon_face(True)            # 18 x 22, Santa hat
-FACE_PLAIN = raccoon_face(False)
-WALK_SANTA = rac(0, 5)
-STAND_SANTA = rac(0, 8)
-KO = rac(1, 4)
-KO_SANTA = rac(1, 9)
-FALL_SANTA = rac(2, 8)
+# The character, straight from the rig that draws the game sprites (tools/raccoon.py).
+FACE = R.face(True)                      # 26 x 29: the game's front-facing head, Santa hat
+FACE_PLAIN = R.face(False)
+FACE_SMALL = R.face(True, small=True)    # 18 x 21: the same face at icon size
+HAT = R.hat('side')
+WALK_SANTA = R.pose(R.side(0, hat=True))
+STAND_SANTA = R.pose(R.front(0, hat=True))
+SWIPE_SANTA = R.pose(R.front(3, hat=True))
+CHEER_SANTA = R.pose(R.front(5, hat=True))
+CLIMB_SANTA = R.pose(R.back(1, hat=True))
+KO = R.pose(R.lying('ko'))
+PASSED_OUT = R.pose(R.lying('ko', hat=True))     # X eyes, tongue out, hat hooked on a foot
 RESERVE = bottle(4)
-LYING_HAT = art(HAT_SIDE, HAT_SIDE_PAL).rotate(28, expand=True, resample=Image.NEAREST)
 
 
 def passed_out_raccoon():
-    """X-eyed, feet up, with the Santa hat knocked off beside its head."""
-    im = Image.new('RGBA', (KO.width + 12, KO.height + 4), (0, 0, 0, 0))
-    im.alpha_composite(KO, (0, 4))
-    im.alpha_composite(LYING_HAT, (KO.width - 8, KO.height - LYING_HAT.height + 6))
-    return im.crop(im.getbbox())
+    return PASSED_OUT
 
 SNOWFLAKE = ['...#...', '.#.#.#.', '..###..', '#######', '..###..', '.#.#.#.', '...#...']
 TREE = ['...#...', '..###..', '.#####.', '..###..', '.#####.', '#######', '...#...']

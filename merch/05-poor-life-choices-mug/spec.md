@@ -4,7 +4,7 @@
 
 ## Design
 
-Two sides, two moods: LAST CALL (mid-swipe, a whiskey bottle flying) and POOR LIFE CHOICES (feet up, hat off). Turn the mug to match your morning.
+Two sides, two moods: LAST CALL (up on the shelf, mid-swipe, a whiskey bottle flying) and POOR LIFE CHOICES (flat on its back, paws up, hat hooked on a foot). Turn the mug to match your morning.
 
 ## Production
 

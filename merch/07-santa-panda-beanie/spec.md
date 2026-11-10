@@ -4,7 +4,7 @@
 
 ## Design
 
-The Santa Panda face embroidered on the cuff, simplified into a textile version that stays crisp in thread.
+The Santa Panda face embroidered on the cuff: the game's own head, reduced to five thread colours so the mask, brows and grey fur all stay crisp in thread.
 
 ## Production
 
@@ -18,23 +18,23 @@ The Santa Panda face embroidered on the cuff, simplified into a textile version 
 
 | Placement | File | Size / position |
 | --- | --- | --- |
-| Front cuff | `embroidery.png` | 1.38 x 1.69 in, centred (max area about 5 x 1.75 in) |
+| Front cuff | `embroidery.png` | 1.39 x 1.55 in, centred (max area about 5 x 1.75 in) |
 
 ### Files (`print/`)
 
 | File | Pixels | Notes |
 | --- | --- | --- |
-| `embroidery.png` | 414 x 506 | 1.38 x 1.69 in, transparent background. |
+| `embroidery.png` | 416 x 464 | 1.39 x 1.55 in, transparent background. |
 
-### Threads (4 of 6 allowed)
+### Threads (5 of 6 allowed)
 
-dark `#111111`, light `#f5f5f0`, fur `#8c8c8c`, hat `#c4161c`
+dark `#111111`, light `#f5f5f0`, fur `#9a9a9a`, shade `#6b6b6b`, hat `#c4161c`
 
-Map to the nearest of Printful's standard thread colours: black, white, grey, red.
+Map to the nearest of Printful's standard thread colours: black, white, light grey, dark grey, red.
 
 ### Notes
 
-- The face is redrawn for thread: the mask merges with the outline and the light brows and muzzle define it, so no detail is smaller than one 1.9 mm stitch block.
+- The face is the game sprite mapped onto thread: the mask, eyes and outline share black, and the white brows and muzzle define it. One pixel is one 1.35 mm stitch block, above the 1.27 mm minimum.
 - On the red beanie the red hat blends into the fabric; the black outline keeps its shape.
 
 ### Before you publish

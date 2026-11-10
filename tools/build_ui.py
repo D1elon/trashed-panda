@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(__file__))
 from pixlib import hexrgb, upscale, outline  # noqa: E402
+import raccoon  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 UI = os.path.join(ROOT, 'assets', 'ui')
@@ -70,67 +71,10 @@ def icon_svg():
         fh.write('\n'.join(out) + '\n')
 
 
-# Hand-drawn front-facing raccoon head: the brand mark (favicon, nav, share image, merch).
-# The in-game front face (tools/build_sprites.py HEAD_FRONT) at brand-mark size, so it
-# matches the side view too: tan-rimmed ears, crown highlight and centre stripe, a cream
-# brow, dark mask patches wrapping the eyes with a cream ring under them, cream muzzle,
-# dark nose, tan cheeks; both eyes are the profile's eye, glancing the same way.
-#   K outline  D mask  N shadow fur  F fur  H highlight  L tan  W cream  E pupil  G glint
-FACE = [
-    '.KK............KK.',
-    'KLDK..........KDLK',
-    'KLDNKKKKKKKKKKNDLK',
-    'KFNFFHHHNNHHHFFNFK',
-    'KFFFFFFHNNHFFFFFFK',
-    'KWWWWWWFNNFWWWWWWK',
-    'KDDDDEEDNNDDEEDDDK',
-    'KDDDWEGDNNDWEGDDDK',
-    'KDDDWEEDWWDWEEDDDK',
-    'KWDDDDDWWWWDDDDDWK',
-    '.KWWDDWWWWWWDDWWK.',
-    '.KLWWWWKKKKWWWWLK.',
-    '..KLWWWWKKWWWWLK..',
-    '...KLLWWWWWWLLK...',
-    '....KKKKKKKKKK....',
-]
-FACE_PAL = {
-    'K': '#1a120c', 'D': '#402d20', 'N': '#62502f', 'F': '#76643c', 'H': '#8d7a50', 'L': '#b29c72',
-    'W': '#ece2cc', 'E': '#0b0705', 'G': '#fffcf4',
-}
-HAT = [
-    '..KKK..........',
-    '.KWWWK.KKKK....',
-    'KWWWwKKRRRRK...',
-    'KwwwKRRRRRRrK..',
-    '.KKKRRRhRRRRrK.',
-    '...KRRRRRRRRrK.',
-    '..KRRRRRRRRRRrK',
-    '.KWWWWWWWWWWWWK',
-    '.KWWWWWWWWWWWWK',
-    '.KwwwwwwwwwwwwK',
-]
-HAT_PAL = {'K': '#2a1410', 'R': '#d8343a', 'r': '#9c1f2b', 'h': '#f26a5e', 'W': '#f6f1e7', 'w': '#c8bfb2'}
-
-
-def paint(rows, pal):
-    im = Image.new('RGBA', (max(len(r) for r in rows), len(rows)), (0, 0, 0, 0))
-    px = im.load()
-    for y, row in enumerate(rows):
-        for x, ch in enumerate(row):
-            if ch in pal:
-                px[x, y] = hexrgb(pal[ch])
-    return im
-
-
-def raccoon_face(santa=True):
-    face = paint(FACE, FACE_PAL)
-    if not santa:
-        return face
-    hat = paint(HAT, HAT_PAL)
-    im = Image.new('RGBA', (face.width, face.height + 7), (0, 0, 0, 0))
-    im.alpha_composite(face, (0, 7))
-    im.alpha_composite(hat, (2, 0))
-    return im
+def raccoon_face(santa=True, small=True):
+    """The brand mark (favicon, nav, share image, merch): the game's own front-facing
+    head from tools/raccoon.py; `small` is the same face at icon size."""
+    return raccoon.face(santa, small=small)
 
 
 def build_favicon():
@@ -140,20 +84,22 @@ def build_favicon():
     fav.alpha_composite(face, ((32 - fw) // 2, (32 - fh) // 2 + 1))
     fav.save(os.path.join(ROOT, 'favicon.png'))
     fav.save(os.path.join(ROOT, 'favicon.ico'), sizes=[(16, 16), (32, 32)])
+    big = raccoon_face(True, small=False)             # large icons use the full-size head
     apple = Image.new('RGBA', (180, 180), hexrgb('#1a120c'))
-    a = upscale(face, 7)
-    apple.alpha_composite(a, ((180 - a.width) // 2, (180 - a.height) // 2 + 4))
+    a = upscale(big, 5)
+    apple.alpha_composite(a, ((180 - a.width) // 2, (180 - a.height) // 2 + 3))
     apple.save(os.path.join(ROOT, 'apple-touch-icon.png'))
     face.save(os.path.join(UI, 'raccoon-face.png'))
     return face
 
 
-def build_app_icons(face):
+def build_app_icons(_face):
     """Home-screen / install icons (web app manifest). The face sits inside the central
     safe zone so the same file also works as a maskable icon."""
+    face = raccoon_face(True, small=False)
     for size in (192, 512):
         icon = Image.new('RGBA', (size, size), hexrgb('#1a120c'))
-        k = max(1, int(size * 0.56) // face.height)
+        k = max(1, int(size * 0.62) // face.height)
         a = upscale(face, k)
         icon.alpha_composite(a, ((size - a.width) // 2, (size - a.height) // 2 + k // 2))
         icon.save(os.path.join(UI, f'icon-{size}.png'), optimize=True)

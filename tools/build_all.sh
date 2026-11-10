@@ -3,7 +3,7 @@
 #   bash tools/build_all.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
-python3 tools/build_sprites.py   # raccoon, bottles, bathroom  -> assets/game, js/game/sprite-data.js
+python3 tools/build_sprites.py   # raccoon (drawn by tools/raccoon.py), bottles -> assets/game, js/game/sprite-data.js
 python3 tools/build_store.py     # store backdrop + world data -> assets/game, js/game/world-data.js
 python3 tools/build_bathroom.py  # passed-out scene, drawn with the store + sprites -> assets/game/bathroom.png
 python3 tools/build_ui.py        # icons, logo, favicon, app icons, help art -> assets/ui, favicon.*

@@ -11,14 +11,14 @@ Regenerate everything with `bash tools/build_all.sh` (it fails if any check belo
 | # | Product | Technique | Blank | Retail |
 | --- | --- | --- | --- | --- |
 | 01 | [The Ugly Trash Panda Sweater](01-ugly-sweater/spec.md) | Jacquard knitting (knitwear) | Printful knitwear: Unisex Classic Fit Knitted Crew Neck Sweater | $64 |
-| 02 | [Naughty List Tee](02-naughty-list-tee/spec.md) | DTG | Printful: Unisex Staple T-Shirt (Bella + Canvas 3001) | $32 |
+| 02 | [Mugshot Tee](02-mugshot-tee/spec.md) | DTG | Printful: Unisex Staple T-Shirt (Bella + Canvas 3001) | $32 |
 | 03 | [Pixel Ornament](03-pixel-ornaments/spec.md) | Sublimation on porcelain, both sides | Printful: Ceramic Ornaments, 2-Side Print (circle, 2.99 in) | $18 |
 | 04 | [Trashed Panda Hoodie](04-trashed-panda-hoodie/spec.md) | DTG, front + back | Printful: Unisex Premium Hoodie (Cotton Heritage M2580) | $58 |
 | 05 | [Poor Life Choices Mug](05-poor-life-choices-mug/spec.md) | Sublimation, full wrap | Printful: White Glossy Mug, 11 oz | $18 |
 | 06 | [Tail Stripe Socks](06-tail-stripe-socks/spec.md) | Sublimation, all-over | Printful: Sublimation Socks (crew) | $20 |
 | 07 | [Santa Panda Beanie](07-santa-panda-beanie/spec.md) | Embroidery, front cuff | Printful: Pom-Pom Knit Cap (or Cuffed Beanie) | $30 |
 | 08 | [Evidence Gift Wrap](08-gift-wrap/spec.md) | Digital print on paper | Printful: Gift Wrap Papers (or Printify Wrapping Papers) | $22 |
-| 09 | [Bathroom Floor Holiday Cards](09-holiday-cards/spec.md) | Digital print | Folded greeting card, 5 x 7 in (Printful or Printify greeting cards) | $16 |
+| 09 | [Merry Trashmas Cards](09-holiday-cards/spec.md) | Digital print | Folded greeting card, 5 x 7 in (Printful or Printify greeting cards) | $16 |
 | 10 | [Kiss-Cut Stickers](10-stickers/spec.md) | Digital print on white vinyl, kiss-cut | Printful: Kiss-Cut Stickers | $6 |
 
 ## How the files are made
@@ -27,7 +27,7 @@ Regenerate everything with `bash tools/build_all.sh` (it fails if any check belo
   nearest-neighbour sampling, so edges stay razor sharp at any size. Never resize these files by a fraction.
 - **300 dpi** for apparel, ceramics, stickers and cards; **150 dpi** for large-format gift wrap.
 - **Transparent backgrounds** wherever the product colour should show through.
-- **Built for the process:** knit charts use 4 yarn colours, embroidery uses 4 threads (limit 6), ornament art sits
+- **Built for the process:** knit charts use 4 yarn colours, embroidery uses 5 threads (limit 6), ornament art sits
   inside the safe circle, black-garment tees have near-black ink knocked out.
 
 ## Setting up with Printful + Shopify
@@ -46,21 +46,21 @@ so if a template differs, keep the artwork centred at the stated width and scale
 | Check | Result | Detail |
 | --- | --- | --- |
 | Sweater red front: yarn colours | pass | 4 of 4 allowed |
-| Sweater red front: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
+| Sweater red front: fur grey never touches base | pass | 0 contacts (mid grey on red blurs at stitch level) |
 | Sweater red back: yarn colours | pass | 4 of 4 allowed |
-| Sweater red back: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
+| Sweater red back: fur grey never touches base | pass | 0 contacts (mid grey on red blurs at stitch level) |
 | Sweater red sleeve: yarn colours | pass | 3 of 4 allowed |
-| Sweater red sleeve: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
+| Sweater red sleeve: fur grey never touches base | pass | 0 contacts (mid grey on red blurs at stitch level) |
 | Sweater green front: yarn colours | pass | 4 of 4 allowed |
-| Sweater green front: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
+| Sweater green front: fur grey never touches base | pass | 0 contacts (mid grey on green blurs at stitch level) |
 | Sweater green back: yarn colours | pass | 4 of 4 allowed |
-| Sweater green back: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
+| Sweater green back: fur grey never touches base | pass | 0 contacts (mid grey on green blurs at stitch level) |
 | Sweater green sleeve: yarn colours | pass | 3 of 4 allowed |
-| Sweater green sleeve: accent never touches base | pass | 0 contacts (red/green blur at stitch level) |
-| Tee black-garment file: near-black ink knocked out | pass | 84 px removed before scaling |
-| Ornament drop: artwork inside 2.6 in safe circle | pass | 0 px outside |
-| Ornament reserve: artwork inside 2.6 in safe circle | pass | 0 px outside |
+| Sweater green sleeve: fur grey never touches base | pass | 0 contacts (mid grey on green blurs at stitch level) |
+| Tee black-garment file: near-black ink knocked out | pass | 490 px removed before scaling |
+| Ornament santa-panda: artwork inside 2.6 in safe circle | pass | 0 px outside |
+| Ornament top-shelf: artwork inside 2.6 in safe circle | pass | 0 px outside |
 | Ornament passed-out: artwork inside 2.6 in safe circle | pass | 0 px outside |
 | Ornament back: artwork inside 2.6 in safe circle | pass | 0 px outside |
-| Beanie embroidery: thread colours | pass | 4 of 6 allowed |
-| Beanie embroidery: smallest detail above 1.27 mm | pass | 1 pixel = 1.95 mm |
+| Beanie embroidery: thread colours | pass | 5 of 6 allowed |
+| Beanie embroidery: smallest detail above 1.27 mm | pass | 1 pixel = 1.35 mm |

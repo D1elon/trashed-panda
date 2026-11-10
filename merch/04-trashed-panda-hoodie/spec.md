@@ -4,7 +4,7 @@
 
 ## Design
 
-Front: the game wordmark with the Santa Panda and the hometown. Back: the moment it all began, head-first through the ceiling, with DROPPED IN FOR THE HOLIDAYS.
+Front: the Santa Panda face over the game wordmark and the hometown. Back: LAST CALL, the raccoon up on the top shelf mid-swipe with one bottle already on its way down.
 
 ## Production
 
@@ -30,7 +30,7 @@ Front: the game wordmark with the Santa Panda and the hometown. Back: the moment
 
 ### Notes
 
-- Both prints read on dark and mid-grey fleece; no knock-out needed because the light ceiling tiles and cream text carry the composition.
+- Both prints read on dark and mid-grey fleece; no knock-out needed because the grey fur, steel shelf and cream text carry the composition.
 
 ### Before you publish
 

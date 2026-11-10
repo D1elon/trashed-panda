@@ -4,7 +4,7 @@
 
 ## Design
 
-Five die-cut stickers from the game: the Santa Panda, the Holiday Reserve, passed out, the wordmark, and the HOLIDAY SPIRITS sale poster from the store wall.
+Five die-cut stickers from the game: the Santa Panda face, the raccoon on the prowl, passed out with the hat on one foot, the Holiday Reserve bottle, and the wordmark.
 
 ## Production
 
@@ -24,11 +24,11 @@ Five die-cut stickers from the game: the Santa Panda, the Holiday Reserve, passe
 
 | File | Pixels | Notes |
 | --- | --- | --- |
-| `santa-panda.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 3.78 in wide, transparent. |
+| `santa-panda.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 4.16 in wide, transparent. |
+| `on-the-prowl.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 4.56 in wide, transparent. |
+| `passed-out.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 4.62 in wide, transparent. |
 | `holiday-reserve.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 1.95 in wide, transparent. |
-| `passed-out.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 4.56 in wide, transparent. |
 | `wordmark.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 4.47 in wide, transparent. |
-| `holiday-spirits.png` | 1650 x 1650 | 1650 x 1650 px (5.5 in), art 3.87 in wide, transparent. |
 
 ### Notes
 
