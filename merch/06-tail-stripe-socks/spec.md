@@ -4,7 +4,7 @@
 
 ## Design
 
-Ringed like a raccoon's tail, scattered with snowflakes and tiny bottles, with the Santa Panda on the ankle.
+Ringed in the tail's own charcoal and pale grey, scattered with red snowflakes and tiny green bottles, with the Santa Panda on the ankle.
 
 ## Production
 

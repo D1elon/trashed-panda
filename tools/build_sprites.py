@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build all game sprites from the original high-res art.
+"""Build the game sprites.
 
     python3 tools/build_sprites.py
 
 Outputs (all at native pixel resolution, drawn with nearest-neighbour scaling):
-    assets/game/raccoon.png        6x10 grid of 80x66 frames (rows 0-4 plain, 5-9 Santa hat)
+    assets/game/raccoon.png        6x10 grid of 80x66 frames (rows 0-4 plain, 5-9 Santa hat),
+                                   drawn by tools/raccoon.py
     assets/game/bottles.png        frames for 5 bottle types (see BOTTLE_FRAMES)
     js/game/sprite-data.js         frame rects + anchors consumed by the renderer
 """
@@ -16,7 +17,8 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(__file__))
-from pixlib import repixelize, quantize, remove_specks, upscale, hexrgb  # noqa: E402
+from pixlib import repixelize, quantize, remove_specks, upscale  # noqa: E402
+import raccoon  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 SRC = os.path.join(ROOT, 'tools', 'source-art')
@@ -26,30 +28,10 @@ os.makedirs(OUT, exist_ok=True)
 PREVIEW = os.environ.get('PREVIEW_DIR')
 
 # ---------------------------------------------------------------------------
-# Raccoon
+# Raccoon: drawn from scratch by tools/raccoon.py (no source art)
 # ---------------------------------------------------------------------------
-RC_W, RC_H = 80, 66
-ROWS = ['walk', 'climb', 'drink', 'swipe']
-SHEET_ROWS = ROWS + ['extra']  # extra: 0 blink, 1 knocked out
-PINK = hexrgb('#e8798f')
-PINK_DARK = hexrgb('#b24a62')
-
-
-def load_raccoon_frames():
-    sheet = Image.open(os.path.join(SRC, 'raccoon-sheet.png'))
-    H = sheet.height
-    frames, pink_masks = [], []
-    for row in range(4):
-        for col in range(6):
-            y0 = round(row * H / 4)
-            cell = sheet.crop((col * 320, y0, col * 320 + 320, y0 + 262))
-            p = repixelize(cell, 4, size=(RC_W, RC_H))
-            p = remove_specks(p, 6, light_thresh=600)
-            a = np.asarray(p).astype(int)
-            pink = (a[..., 3] > 0) & (a[..., 0] > a[..., 1] + 45) & (a[..., 0] > a[..., 2] + 15) & (a[..., 0] > 150)
-            frames.append(p)
-            pink_masks.append(pink)
-    return frames, pink_masks
+RC_W, RC_H = raccoon.CW, raccoon.CH
+SHEET_ROWS = raccoon.SHEET_ROWS
 
 
 def grid(frames, cols, cw, ch):
@@ -64,372 +46,16 @@ def split(im, cols, cw, ch, n):
     return [im.crop(((i % cols) * cw, (i // cols) * ch, (i % cols) * cw + cw, (i // cols) * ch + ch)) for i in range(n)]
 
 
-# Santa hat, side view, facing right. Brim sits on the head, tail flops back.
-#   K outline  R red  r shadow red  h highlight  W fur  w fur shade
-HAT_SIDE = [
-    '.......KKKK.....',
-    '.....KKRRRRK....',
-    '...KKRRRhRRrK...',
-    '..KRRRRRRRRRrK..',
-    '.KRRKKKRRRRRRrK.',
-    'KWWK..KRRRRRRrK.',
-    'KWWwK.KRRRRRRRrK',
-    'KwwwK.KRRRRRRRrK',
-    '.KKK.KWWWWWWWWWK',
-    '....KWWWWWWWWWWK',
-    '....KwwwwwwwwwwK',
-    '.....KKKKKKKKKK.',
-]
-# Back view (climbing): symmetric cone, tip flopped to the left.
-HAT_BACK = [
-    '..KKK..........',
-    '.KWWWK.KKKK....',
-    'KWWWwKKRRRRK...',
-    'KwwwKRRRRRRrK..',
-    '.KKKRRRhRRRRrK.',
-    '...KRRRRRRRRrK.',
-    '..KRRRRRRRRRRrK',
-    '..KRRRRRRRRRRrK',
-    '.KWWWWWWWWWWWWK',
-    '.KWWWWWWWWWWWWK',
-    '.KwwwwwwwwwwwwK',
-    '..KKKKKKKKKKKK.',
-]
-HAT_PAL = {
-    'K': hexrgb('#2a1410'), 'R': hexrgb('#d8343a'), 'r': hexrgb('#9c1f2b'),
-    'h': hexrgb('#f26a5e'), 'W': hexrgb('#f6f1e7'), 'w': hexrgb('#c8bfb2'),
-}
-
-
-def art(rows, pal, flip=False):
-    h, w = len(rows), max(len(r) for r in rows)
-    im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-    px = im.load()
-    for y, row in enumerate(rows):
-        for x, ch in enumerate(row):
-            if ch in pal:
-                px[x, y] = pal[ch]
-    return im.transpose(Image.FLIP_LEFT_RIGHT) if flip else im
-
-
-# Where the hat sits for each row: head search window (x range) and a nudge.
-HAT_RULES = {
-    # row: (x0, x1, dx, dy, hat)
-    'walk':  (48, 74, -1, -5, 'side'),
-    'climb': (20, 60, 0, 2, 'back'),
-    'drink': (48, 74, -1, -5, 'side'),
-    'swipe': (26, 58, 0, -5, 'side'),
-}
-
-
-def head_anchor(frame, x0, x1):
-    a = np.asarray(frame)[..., 3] > 0
-    sub = a[:, x0:x1]
-    ys = np.where(sub.any(1))[0]
-    top = int(ys[0])
-    band = sub[top:top + 9]
-    xs = np.where(band.any(0))[0]
-    cx = x0 + (int(xs[0]) + int(xs[-1])) / 2
-    return cx, top
-
-
-def feet_y(frame):
-    a = np.asarray(frame)[..., 3] > 0
-    return int(np.where(a.any(1))[0][-1])
-
-
-# Curated raccoon palette: one ramp, chosen by hand, instead of the noisy source colours.
-RACCOON_RAMP = [  # (max luminance, colour)
-    (24, '#1a120c'),   # 0 outline
-    (44, '#402d20'),   # 1 mask + tail rings (light enough for a black pupil to read)
-    (62, '#4d3b25'),   # 2 deep shadow
-    (80, '#62502f'),   # 3 shadow fur
-    (100, '#76643c'),  # 4 base fur
-    (122, '#8d7a50'),  # 5 highlight fur
-    (999, '#b29c72'),  # 6 light tan / muzzle / belly
-]
-R_PAL = [hexrgb(c) for _, c in RACCOON_RAMP]
-PINK_IDX = 100
-
-
-def _lum(p):
-    return 0.3 * p[0] + 0.59 * p[1] + 0.11 * p[2]
-
-
-def clean_frame(img):
-    """Repaint a re-pixelized frame onto the curated ramp, kill speckle noise,
-    add rim light / belly shadow and a uniform 1px outline."""
-    a = np.asarray(img)
-    h, w = a.shape[:2]
-    idx = np.full((h, w), -1, int)
-    for y in range(h):
-        for x in range(w):
-            p = a[y, x]
-            if p[3] == 0:
-                continue
-            if int(p[0]) > int(p[1]) + 40:
-                idx[y, x] = PINK_IDX
-                continue
-            L = _lum(p)
-            for i, (m, _) in enumerate(RACCOON_RAMP):
-                if L < m:
-                    idx[y, x] = i
-                    break
-    # majority filter: pixels with no 4-neighbour of their own colour join the local majority
-    for _ in range(2):
-        out = idx.copy()
-        for y in range(1, h - 1):
-            for x in range(1, w - 1):
-                v = idx[y, x]
-                if v < 0 or v in (0, PINK_IDX):
-                    continue
-                if any(idx[y + dy, x + dx] == v for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                    continue
-                nb = [idx[y + dy, x + dx] for dy in (-1, 0, 1) for dx in (-1, 0, 1) if (dy or dx)]
-                nb = [n for n in nb if n > 0 and n != PINK_IDX] or [n for n in nb if n >= 0]
-                vals, counts = np.unique(nb, return_counts=True)
-                out[y, x] = vals[counts.argmax()]
-        idx = out
-    opaque = idx >= 0
-    # rim light along the back, shadow along the belly (per column)
-    for x in range(w):
-        col = np.where(opaque[:, x])[0]
-        if len(col) < 6:
-            continue
-        top, bot = col[0], col[-1]
-        for y in (top + 1, top + 2):
-            if idx[y, x] == 4:
-                idx[y, x] = 5
-        for y in (bot - 1, bot - 2):
-            if idx[y, x] == 4:
-                idx[y, x] = 3
-    # uniform outline on every edge pixel
-    for y in range(h):
-        for x in range(w):
-            if not opaque[y, x] or idx[y, x] == PINK_IDX:
-                continue
-            for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                ny, nx = y + dy, x + dx
-                if not (0 <= ny < h and 0 <= nx < w) or not opaque[ny, nx]:
-                    idx[y, x] = 0
-                    break
-    out = np.zeros((h, w, 4), np.uint8)
-    for y in range(h):
-        for x in range(w):
-            v = idx[y, x]
-            if v < 0:
-                continue
-            out[y, x] = a[y, x] if v == PINK_IDX else R_PAL[v]
-    return Image.fromarray(out, 'RGBA')
-
-
-# eye search boxes per row (cell coordinates); climb is a back view so no eyes
-EYE_BOXES = {'walk': (56, 22, 69, 32), 'climb': None, 'drink': (55, 28, 69, 40), 'swipe': None}
-
-
-# The source art's "eye" was a 1px sliver of outline colour lost inside the dark mask.
-# Every face-visible frame gets a hand-designed eye stamped at the detected position.
-#   B pupil  W glint  S sclera (cream, behind the pupil so it reads at any size)
-EYE_OPEN = ['.BB.', 'SBWB', 'SBBB', '.BB.']
-EYE_CLOSED = ['....', '.BB.', 'B..B', '....']   # happy closed lid for the idle blink
-EYE_KO = ['S..S', '.SS.', '.SS.', 'S..S']        # X eyes for the knocked-out pose
-EYE_PAL = {'B': hexrgb('#0b0705'), 'W': hexrgb('#fffcf4'), 'S': hexrgb('#ece2cc')}
-
-
-def find_eye(frame, box):
-    """Interior outline-coloured pixels inside the eye box = the original eye sliver."""
-    a = np.asarray(frame)
-    x0, y0, x1, y1 = box
-    k = R_PAL[0][:3]
-    pts = []
-    for y in range(y0, y1):
-        for x in range(x0, x1):
-            if a[y, x, 3] and tuple(a[y, x, :3]) == k:
-                if all(a[y + dy, x + dx, 3] for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                    pts.append((x, y))
-    if not pts:
-        return None
-    cx = sum(p[0] for p in pts) / len(pts)
-    cy = sum(p[1] for p in pts) / len(pts)
-    return pts, cx, cy
-
-
-def stamp_eye(frame, eye, pattern, dx=-1):
-    a = np.array(frame)
-    pts, cx, cy = eye
-    for (x, y) in pts:
-        a[y, x] = R_PAL[1]
-    h, w = len(pattern), len(pattern[0])
-    ox = round(cx - (w - 1) / 2 + 0.3) + dx
-    oy = round(cy - (h - 1) / 2)
-    for yy, line in enumerate(pattern):
-        for xx, ch in enumerate(line):
-            if ch in EYE_PAL:
-                a[oy + yy, ox + xx] = EYE_PAL[ch]
-            elif a[oy + yy, ox + xx, 3] and tuple(a[oy + yy, ox + xx, :3]) == R_PAL[0][:3]:
-                a[oy + yy, ox + xx] = R_PAL[1]
-    return Image.fromarray(a, 'RGBA')
-
-
-# The standing (swipe) pose faces the camera, so its head is redrawn by hand. It is the
-# profile's face seen from the front: the same palette and features as the walk/drink
-# heads (tan-rimmed ears, crown highlights, a thick cream brow, dark mask patches running
-# out toward the ears with a cream ring under them, cream muzzle, dark nose, shaded jaw)
-# and the profile's own 4x4 eye on both sides, unmirrored, so he glances toward the paw
-# he swipes with exactly like the side view. Sized to sit on the shoulders (the S block
-# bottom-left is the back of the neck).
-#   K outline  D mask  s/S shadow fur  F fur  H highlight  L tan  W cream  E pupil  G glint
-HEAD_FRONT = [
-    '.....KK..............KK...',
-    '....KLHK............KHLK..',
-    '....KLDSK..........KSDLK..',
-    '....KLDDSKKKKKKKKKKSDDLK..',
-    '....KFSFFFHHHSSHHHFFFSFK..',
-    '....KFFFFHHHFSSFHHHFFFFK..',
-    '...KFFFFFFFFFSSFFFFFFFFFK.',
-    '...KFWWWWFFFFSSFFFFWWWWFK.',
-    '...KWWWWWWWFFSSFFWWWWWWWK.',
-    '..KFWDDDDDWWFSSFWWDDDDDWFK',
-    '..KWDDDDDEEDFSSFDEEDDDDDWK',
-    '..KDDDDDWEGEFSSFWEGEDDDDDK',
-    '..KDDDDDWEEEFSSFWEEEDDDDDK',
-    '..KWDDDDDEEDWWWWDEEDDDDDWK',
-    '..LKWDDDDDDWWWWWWDDDDDDWKL',
-    '..KLLWDDDWWWWWWWWWWDDDWLLK',
-    'SSSKLLWWWWWWKKKKWWWWWWLLK.',
-    'SSSSKFLWWWWWWKKWWWWWWLFK..',
-    'SSSSSKFLWWWWWWWWWWWWLFK...',
-    'SSSSSSKSLLWWWWWWWWLLSK....',
-    'SSSSSSSKsSLWWWWWWLSsK.....',
-    'SSSSSSSSSKKKKKKKKKK.......',
-]
-HEAD_POS = (27, 8)
-HEAD_PAL = {'K': '#1a120c', 'D': '#402d20', 's': '#4d3b25', 'S': '#62502f', 'F': '#76643c', 'H': '#8d7a50',
-            'L': '#b29c72', 'W': '#ece2cc', 'E': '#0b0705', 'G': '#fffcf4'}   # = the profile's ramp + eye
-ARC_LIGHT, ARC_MID = hexrgb('#f6efe0'), hexrgb('#d9ccae')
-
-
-def replace_head(frame):
-    hx, hy = HEAD_POS
-    head = art(HEAD_FRONT, {k: hexrgb(v) for k, v in HEAD_PAL.items()})
-    a = np.array(frame)
-    bottom = hy + head.height
-    a[2:hy + 16, hx - 1:60] = 0          # old head
-    a[hy + 16:bottom, hx + 1:60] = 0     # old jaw (keeps the back outline on the left)
-    im = Image.fromarray(a, 'RGBA')
-    im.alpha_composite(head, (hx, hy))
-    a = np.array(im)
-    op = a[..., 3] > 0
-    for y in range(hy - 1, bottom + 2):   # re-seal the silhouette where head meets body
-        for x in range(hx - 3, hx + head.width + 1):
-            if op[y, x] and not all(op[y + dy, x + dx] for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                a[y, x] = R_PAL[0]
-    return Image.fromarray(a, 'RGBA')
-
-
-def lighten_arcs(frame):
-    """Swipe motion arcs are separate specks of pixels: paint them as light streaks, no outline."""
-    a = np.array(frame)
-    op = a[..., 3] > 0
-    h, w = op.shape
-    seen = np.zeros_like(op)
-    comps = []
-    for y in range(h):
-        for x in range(w):
-            if op[y, x] and not seen[y, x]:
-                stack, comp = [(y, x)], []
-                seen[y, x] = True
-                while stack:
-                    cy, cx = stack.pop()
-                    comp.append((cy, cx))
-                    for dy in (-1, 0, 1):
-                        for dx in (-1, 0, 1):
-                            ny, nx = cy + dy, cx + dx
-                            if 0 <= ny < h and 0 <= nx < w and op[ny, nx] and not seen[ny, nx]:
-                                seen[ny, nx] = True
-                                stack.append((ny, nx))
-                comps.append(comp)
-    comps.sort(key=len, reverse=True)
-    for comp in comps[1:]:
-        ys = [p[0] for p in comp]
-        mid = (min(ys) + max(ys)) / 2
-        for (y, x) in comp:
-            a[y, x] = ARC_LIGHT if y >= mid else ARC_MID
-    return Image.fromarray(a, 'RGBA')
-
-
-FACE_LIGHT_BOXES = {'walk': (50, 22, 75, 35), 'drink': (50, 30, 73, 44)}
-
-
-def recolor_box(frame, box, src, dst):
-    a = np.array(frame)
-    x0, y0, x1, y1 = box
-    sub = a[y0:y1, x0:x1]
-    m = (sub[..., :3] == src[:3]).all(-1) & (sub[..., 3] > 0)
-    sub[m] = dst
-    return Image.fromarray(a, 'RGBA')
-
-
 def build_raccoon():
-    frames, pinks = load_raccoon_frames()
-    sheet = grid(frames, 6, RC_W, RC_H)
-    q = quantize(sheet, 18)
-    frames = split(q, 6, RC_W, RC_H, 24)
-    # restore tongue colour that palette reduction merged away
-    for f, pm in zip(frames, pinks):
-        a = np.asarray(f).copy()
-        if pm.any():
-            ys, xs = np.where(pm)
-            for y, x in zip(ys, xs):
-                a[y, x] = PINK if (y == ys.min()) else PINK_DARK if y == ys.max() else PINK
-            f.paste(Image.fromarray(a, 'RGBA'))
-    frames = [clean_frame(f) for f in frames]
-    # profile faces: brows, cheek ring and muzzle in cream to match the front-facing head
-    for i, f in enumerate(frames):
-        box = FACE_LIGHT_BOXES.get(ROWS[i // 6])
-        if box:
-            frames[i] = recolor_box(f, box, R_PAL[6], hexrgb(HEAD_PAL['W']))
-    eyes = []
-    last = {}
-    for i, f in enumerate(frames):
-        row = ROWS[i // 6]
-        box = EYE_BOXES[row]
-        if box is None:
-            eyes.append(None)
+    out, cells = raccoon.sheet()
+    for i, c in enumerate(cells):                    # nothing may touch the cell edge (it would be cut off)
+        if c is None:
             continue
-        e = find_eye(f, box) or last.get(row)
-        if e is None:
-            raise SystemExit(f'no eye found in frame {i} ({row})')
-        last[row] = e
-        eyes.append(e)
-    base_walk0 = frames[0]
-    frames = [stamp_eye(f, e, EYE_OPEN) if e else f for f, e in zip(frames, eyes)]
-    frames = [lighten_arcs(replace_head(f)) if ROWS[i // 6] == 'swipe' else f for i, f in enumerate(frames)]
-    # extra row: idle blink, knocked-out (flat on its back, feet up, X eyes)
-    extra = [stamp_eye(base_walk0, eyes[0], EYE_CLOSED),
-             stamp_eye(base_walk0, eyes[0], EYE_KO).transpose(Image.FLIP_TOP_BOTTOM)]
-    extra += [Image.new('RGBA', (RC_W, RC_H), (0, 0, 0, 0))] * (6 - len(extra))
-    hats = {'side': art(HAT_SIDE, HAT_PAL), 'back': art(HAT_BACK, HAT_PAL)}
-    santa, meta = [], []
-    for i, f in enumerate(frames):
-        row = ROWS[i // 6]
-        x0, x1, dx, dy, kind = HAT_RULES[row]
-        cx, top = head_anchor(f, x0, x1)
-        hat = hats[kind]
-        hx = int(round(cx - hat.width / 2 + dx))
-        hy = int(top - hat.height + dy + 9)
-        s = f.copy()
-        s.alpha_composite(hat, (max(0, hx), max(0, hy)))
-        santa.append(s)
-        meta.append({'row': row, 'headX': cx, 'headTop': top, 'feet': feet_y(f)})
-    hat0 = santa[0].copy()
-    hat_only = Image.fromarray(np.where((np.asarray(hat0) != np.asarray(frames[0])).any(-1, keepdims=True), np.asarray(hat0), 0).astype(np.uint8), 'RGBA')
-    santa_blink = extra[0].copy(); santa_blink.alpha_composite(hat_only)
-    santa_ko = extra[1].transpose(Image.FLIP_TOP_BOTTOM).copy(); santa_ko.alpha_composite(hat_only)
-    santa_extra = [santa_blink, santa_ko.transpose(Image.FLIP_TOP_BOTTOM)] + extra[2:]
-    out = grid(frames + extra + santa + santa_extra, 6, RC_W, RC_H)
+        op = c.c != '.'
+        if op[0].any() or op[-1].any() or op[:, 0].any() or op[:, -1].any():
+            raise SystemExit(f'raccoon frame {i} touches the edge of its cell')
     out.save(os.path.join(OUT, 'raccoon.png'), optimize=True)
-    return out, meta
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -512,10 +138,11 @@ def gold_swap(cell):
 
 
 def main():
-    rac, rmeta = build_raccoon()
+    rac = build_raccoon()
     bot, bmeta = build_bottles()
     data = {
-        'raccoon': {'w': RC_W, 'h': RC_H, 'cols': 6, 'rows': SHEET_ROWS, 'santaRowOffset': 5, 'frames': rmeta},
+        'raccoon': {'w': RC_W, 'h': RC_H, 'cols': 6, 'rows': SHEET_ROWS, 'santaRowOffset': 5,
+                    'cx': raccoon.CX, 'climbFeet': raccoon.CLIMB_FEET},
         'bottles': {'w': BT_W, 'h': BT_H, 'kinds': BOTTLE_KINDS + ['reserve'], 'frames': FRAME_NAMES,
                     'spinStart': 6, 'spinCount': 8, 'cols': bmeta['cols'], 'upBox': bmeta['upBox']},
     }

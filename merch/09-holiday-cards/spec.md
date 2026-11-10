@@ -1,10 +1,10 @@
-# Bathroom Floor Holiday Cards
+# Merry Trashmas Cards
 
-**Retail:** $16  ·  **Shop id:** `bathroom-floor-cards`
+**Retail:** $16  ·  **Shop id:** `trashmas-cards`
 
 ## Design
 
-SEASON'S GREETINGS from the bathroom floor, with the wordmark face and site on the back. Blank inside for your own confession.
+MERRY TRASHMAS: the raccoon with both arms in the air and its Santa hat on, FROM ASHLAND WITH LOVE underneath. The face and the site are on the back. Blank inside for your own confession.
 
 ## Production
 

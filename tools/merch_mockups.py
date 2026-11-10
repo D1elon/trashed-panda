@@ -207,7 +207,7 @@ def mock_mug(side_art):
     im.alpha_composite(ink_outline(shaded(handle, white, shadow_w=2)))
     body = rect_mask((22, 40, 120, 138)) | ellipse_mask((22, 128, 119, 148))
     bl = shaded(body, white, shadow_w=5)
-    paste(bl, side_art, centered(side_art, 71, 90 - side_art.height // 2), body)
+    paste(bl, side_art, centered(side_art, 71, 94 - side_art.height // 2), body)
     im.alpha_composite(ink_outline(bl))
     rim = ellipse_mask((22, 32, 119, 48))
     im.alpha_composite(ink_outline(shaded(rim, white, shadow_w=1)))
@@ -257,7 +257,7 @@ def mock_socks():
     a = np.array(front)
     a[face_bg] = PAL['cream']
     front = Image.fromarray(a, 'RGBA')
-    front.alpha_composite(D.FACE, (38, 41))
+    front.alpha_composite(D.FACE_SMALL, (38, 41))
     im.alpha_composite(front)
     return im
 
@@ -266,7 +266,7 @@ def mock_socks():
 # Stickers, gift wrap, cards
 # ---------------------------------------------------------------------------
 def mock_sticker(art):
-    k = max(1, 136 // max(art.width, art.height))
+    k = max(1, 156 // (max(art.width, art.height) + 4))      # art plus its white border must fit the tile
     big = upscale(art, k)
     border = 2 * k
     w, h = big.width + border * 2, big.height + border * 2

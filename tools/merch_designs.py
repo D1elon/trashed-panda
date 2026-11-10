@@ -1,43 +1,56 @@
 """Merch artwork, designed for how each product is actually made.
 
-Every function returns native-resolution pixel art. Production constraints are part of
-the design, not an afterthought:
+Every function returns native-resolution pixel art. The raccoon in every design is the
+game's own character, rendered by tools/raccoon.py (the same rig that draws the sprite
+sheet), so the merch cannot drift away from the game.
+
+Production constraints are part of the design, not an afterthought:
 
 * Knitwear: jacquard knitting allows 4 yarn colours in total (base included). The knit
-  charts are drawn on a 4-role palette, and accent colour never touches the base colour
-  directly (low-contrast neighbours blur at the stitch level).
-* Embroidery: at most 6 thread colours and ~1.3 mm minimum detail, so the beanie uses a
-  simplified textile version of the face in 4 universal thread colours.
+  charts are drawn on a 4-role palette (base, cream, charcoal, fur grey), and the grey
+  never touches the base colour directly: a mid grey on red or green blurs at the stitch
+  level, so it is always fenced in by charcoal.
+* Embroidery: at most 6 thread colours and ~1.3 mm minimum detail, so the beanie uses the
+  face reduced to 5 thread colours.
 * DTG prints on dark garments: near-black outline pixels are knocked out in production
   (the garment shows through), so designs must read without them.
 """
+import os
+
 from PIL import Image, ImageDraw
 
-from merchkit import (PAL, FACE, KO, RESERVE, FALL_SANTA, STAND_SANTA, LYING_HAT, hexrgb, upscale,
-                      text3x5, text3x5_width, font_text, tiny_text, centered, glyph, ink_outline, rac,
-                      bottle, passed_out_raccoon, from_rows, art, HAT_SIDE, HAT_SIDE_PAL, ROOT, GAME,
-                      SNOWFLAKE, TREE, MINI_BOTTLE)
-from build_ui import FACE as FACE_ROWS, HAT as HAT_ROWS
-import os
+import raccoon as R
+from merchkit import (PAL, FACE, FACE_SMALL, HAT, WALK_SANTA, STAND_SANTA, SWIPE_SANTA, CHEER_SANTA, CLIMB_SANTA,
+                      PASSED_OUT, RESERVE, hexrgb, upscale, text3x5, text3x5_width, font_text, tiny_text, centered,
+                      glyph, ink_outline, bottle, ROOT, SNOWFLAKE, TREE, MINI_BOTTLE)
 
 SEASON = 2026          # printed on the ornament back; bump each year (the story itself is Thanksgiving 2025)
 
 # ---------------------------------------------------------------------------
-# Textile face: the brand face reduced to roles for knit / embroidery
+# Textile face: the game's head reduced to roles for knit / embroidery
 # ---------------------------------------------------------------------------
-FACE_ROLE = {'K': 'dark', 'D': 'dark', 'E': 'dark', 'N': 'fur', 'F': 'fur', 'H': 'fur', 'L': 'light', 'W': 'light', 'S': 'light', 'G': 'light'}
-HAT_ROLE = {'K': 'dark', 'R': 'hat', 'r': 'hat', 'h': 'hat', 'W': 'light', 'w': 'light'}
+ROLE = {'K': 'dark', 'M': 'dark', 'E': 'dark', 'N': 'dark', 'd': 'dark', 'k': 'dark',
+        'W': 'light', 'G': 'light', 'L': 'light', 'Y': 'light', 'y': 'light',
+        'F': 'fur', 'H': 'fur', 'S': 'shade', 'm': 'shade',
+        'R': 'hat', 'r': 'hat', 'h': 'hat'}
 
 
-def textile_face(colors, hat=True):
-    """colors: {'dark', 'fur', 'light', 'hat'} -> rgba. Pass fur=dark for a two-tone face."""
-    face = from_rows(FACE_ROWS, {k: colors[v] for k, v in FACE_ROLE.items()})
-    if not hat:
-        return face
-    hat_img = from_rows(HAT_ROWS, {k: colors[v] for k, v in HAT_ROLE.items()})
-    im = Image.new('RGBA', (face.width, face.height + 7), (0, 0, 0, 0))
-    im.alpha_composite(face, (0, 7))
-    im.alpha_composite(hat_img, (2, 0))
+def textile_face(colors, hat=True, small=False, bright_eyes=False):
+    """colors: {'dark', 'light', 'fur', 'hat'[, 'shade']} -> rgba ('shade' defaults to 'fur').
+    bright_eyes: with only one dark colour the eye would vanish into the mask, so the eye
+    is drawn light with a dark pupil instead."""
+    colors = dict(colors)
+    colors.setdefault('shade', colors['fur'])
+    role = dict(ROLE, E='light', G='dark') if bright_eyes else ROLE
+    cel = R.face_cel(hat, small=small)
+    h, w = cel.c.shape
+    im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(h):
+        for x in range(w):
+            ch = cel.c[y, x]
+            if ch != '.':
+                px[x, y] = colors[role[ch]]
     return im
 
 
@@ -45,8 +58,8 @@ def textile_face(colors, hat=True):
 # Knitwear (4 yarn colours)
 # ---------------------------------------------------------------------------
 YARN = {
-    'red':   {'base': '#b3262e', 'cream': '#efe6d2', 'dark': '#2e2019', 'accent': '#24553a', 'hat': 'base'},
-    'green': {'base': '#24553a', 'cream': '#efe6d2', 'dark': '#2e2019', 'accent': '#b3262e', 'hat': 'accent'},
+    'red':   {'base': '#b3262e', 'cream': '#efe6d2', 'dark': '#2b2522', 'accent': '#8d8578', 'hat': 'base'},
+    'green': {'base': '#24553a', 'cream': '#efe6d2', 'dark': '#2b2522', 'accent': '#8d8578', 'hat': 'base'},
 }
 KNIT_W, KNIT_H = 68, 88       # front/back chart: 1 cell = 1-2 stitches on a real sweater
 SLEEVE_W, SLEEVE_H = 30, 84
@@ -70,82 +83,74 @@ def _dots(px, w, y, col, step=4, off=0):
         px[x, y] = col
 
 
-def _yoke(im, c):
-    """Shared top band: dots, zigzag, a cream band of base-colour trees with accent stars."""
-    w = im.width
-    px = im.load()
-    _dots(px, w, 1, c['cream'], 4, 1)
-    _zigzag(px, w, 3, c['cream'])
+def _tail_band(im, c, y, rows=2, rings=5):
+    """Raccoon-tail rings: charcoal, grey, charcoal ... always starting and ending on charcoal."""
     d = ImageDraw.Draw(im)
-    d.rectangle((0, 9, w - 1, 20), fill=c['cream'])
-    star = ['..#..', '.###.', '#####', '.###.', '..#..']
-    for i, x in enumerate(range(1, w - 6, 9)):
-        if i % 2 == 0:
-            im.alpha_composite(glyph(TREE, c['base']), (x, 11))
-        else:
-            im.alpha_composite(glyph(star, c['accent']), (x + 1, 12))
+    for i in range(rings):
+        d.rectangle((0, y + i * rows, im.width - 1, y + (i + 1) * rows - 1), fill=c['dark'] if i % 2 == 0 else c['accent'])
+    return y + rings * rows
+
+
+def _yoke(im, c):
+    """Shared top: a ringed-tail band, then a cream zigzag and dots."""
     px = im.load()
-    _zigzag(px, w, 22, c['cream'])
-    _dots(px, w, 27, c['cream'], 4, 3)
+    y = _tail_band(im, c, 2)
+    px = im.load()
+    _zigzag(px, im.width, y + 2, c['cream'])
+    _dots(px, im.width, y + 7, c['cream'], 4, 1)
+    return y + 9
 
 
 def _hem(im, c, y):
-    w = im.width
     d = ImageDraw.Draw(im)
-    d.rectangle((0, y, w - 1, y + 11), fill=c['dark'])
-    for i, x in enumerate(range(2, w - 4, 8)):
-        im.alpha_composite(glyph(MINI_BOTTLE, c['cream']), (x, y + 2))
+    d.rectangle((0, y, im.width - 1, im.height - 1), fill=c['dark'])
     px = im.load()
-    _dots(px, w, y + 13, c['cream'], 4, 1)
+    _zigzag(px, im.width, y + 2, c['cream'])
 
 
 def knit_front(cw):
+    """One big face: the game's head at two stitches per pixel, hat in the sweater's own colour."""
     c = _yarn(cw)
     im = Image.new('RGBA', (KNIT_W, KNIT_H), c['base'])
-    _yoke(im, c)
-    face = textile_face({'dark': c['dark'], 'fur': c['dark'], 'light': c['cream'], 'hat': c['hat']})
+    top = _yoke(im, c)
+    face = upscale(textile_face({'dark': c['dark'], 'fur': c['accent'], 'light': c['cream'], 'hat': c['hat']}, bright_eyes=True), 2)
     fx = (KNIT_W - face.width) // 2
-    im.alpha_composite(face, (fx, 31))
-    # snowflakes and bottles flank the face, all in cream (never accent on base)
-    for side in (-1, 1):
-        im.alpha_composite(glyph(SNOWFLAKE, c['cream']), (KNIT_W // 2 + side * 22 - 3, 33))
-        im.alpha_composite(glyph(MINI_BOTTLE, c['cream']), (KNIT_W // 2 + side * 20 - 2, 45))
-    for i, word in enumerate(('HOLIDAY', 'SPIRITS')):
-        t = tiny_text(word, c['cream'])
-        im.alpha_composite(t, ((KNIT_W - t.width) // 2, 56 + i * 7))
-    px = im.load()
-    _zigzag(px, KNIT_W, 70, c['cream'])
-    _hem(im, c, 76 - 2)
+    im.alpha_composite(face, (fx, top + 1))
+    for side in (0, 1):                       # snowflakes and bottles down both edges, all in cream
+        x = 0 if side == 0 else KNIT_W - 7
+        im.alpha_composite(glyph(SNOWFLAKE, c['cream']), (x, 30))
+        im.alpha_composite(glyph(MINI_BOTTLE, c['cream']), (x + 1, 44))
+        im.alpha_composite(glyph(SNOWFLAKE, c['cream']), (x, 58))
+    _hem(im, c, 80)
     return im
 
 
 def knit_back(cw):
     c = _yarn(cw)
     im = Image.new('RGBA', (KNIT_W, KNIT_H), c['base'])
-    _yoke(im, c)
+    top = _yoke(im, c)
     for i, word in enumerate(('TRASHED', 'PANDA')):
         t = font_text(word, c['cream'])
-        im.alpha_composite(t, ((KNIT_W - t.width) // 2, 36 + i * 11))
-    px = im.load()
-    for (x, y) in ((9, 62), (34, 63), (59, 62)):
-        im.alpha_composite(glyph(SNOWFLAKE, c['cream']), (x - 3, y - 3))
-    for (x, y) in ((4, 32), (63, 32), (21, 31), (47, 31)):
-        im.putpixel((x, y), c['cream'])
-    _zigzag(px, KNIT_W, 70, c['cream'])
-    _hem(im, c, 74)
+        im.alpha_composite(t, ((KNIT_W - t.width) // 2, top + 4 + i * 11))
+    y = top + 30
+    for i, x in enumerate(range(3, KNIT_W - 6, 9)):
+        g = glyph(SNOWFLAKE if i % 2 == 0 else MINI_BOTTLE, c['cream'])
+        im.alpha_composite(g, (x + (0 if i % 2 == 0 else 1), y))
+    for i, word in enumerate(('ASHLAND VA', 'EST 2025')):
+        t = tiny_text(word, c['cream'])
+        im.alpha_composite(t, ((KNIT_W - t.width) // 2, y + 12 + i * 8))
+    _hem(im, c, 80)
     return im
 
 
 def knit_sleeve(cw):
-    """Sleeves are ringed like a raccoon's tail."""
+    """Sleeves are ringed exactly like the tail: charcoal and grey bands, charcoal cuff."""
     c = _yarn(cw)
     im = Image.new('RGBA', (SLEEVE_W, SLEEVE_H), c['base'])
     d = ImageDraw.Draw(im)
-    for y in range(6, SLEEVE_H - 14, 14):
-        d.rectangle((0, y, SLEEVE_W - 1, y + 4), fill=c['dark'])
-        for x in range(1, SLEEVE_W, 4):
-            im.putpixel((x, y + 9), c['cream'])
-    d.rectangle((0, SLEEVE_H - 10, SLEEVE_W - 1, SLEEVE_H - 1), fill=c['dark'])
+    for i, y in enumerate(range(6, 72, 6)):
+        d.rectangle((0, y, SLEEVE_W - 1, y + 5), fill=c['dark'] if i % 2 == 0 else c['accent'])
+    d.rectangle((0, 72, SLEEVE_W - 1, SLEEVE_H - 1), fill=c['dark'])
     return im
 
 
@@ -161,36 +166,44 @@ def knit_tile(cw):
 
 
 # ---------------------------------------------------------------------------
-# Tee: the Naughty List
+# Tee: the mugshot
 # ---------------------------------------------------------------------------
-def design_naughty_list(dark_ink=False):
+def design_mugshot(dark_ink=False):
+    """Booking photo: height chart, the raccoon holding its placard, the verdict."""
     ink = PAL['brown_dk'] if dark_ink else PAL['cream']
+    faint = hexrgb('#a8997e') if dark_ink else hexrgb('#8d8371')
     red = PAL['red'] if dark_ink else PAL['red_hi']
-    head1 = font_text('NAUGHTY', ink)
-    head2 = font_text('LIST', red)
-    items = ['BROKE IN', 'SMASHED THE SHELVES', 'DRANK THE EVIDENCE', 'PASSED OUT']
-    item_w = max(text3x5_width(i) for i in items) + 9
-    w = max(FACE.width + 4 + head1.width, item_w)
-    h = FACE.height + 3 + len(items) * 9 + 1
-    im = Image.new('RGBA', (w + 2, h), (0, 0, 0, 0))
-    hx = (w - (FACE.width + 4 + head1.width)) // 2
-    im.alpha_composite(FACE, (hx, 0))
-    im.alpha_composite(head1, (hx + FACE.width + 4, 6))
-    im.alpha_composite(head2, (hx + FACE.width + 4, 6 + head1.height + 3))
+    board, board_ink = hexrgb('#f6ead2'), hexrgb('#1b1513')
+    rac = STAND_SANTA
+    w = 80
+    floor = 4 + rac.height
+    verdict = font_text('GUILTY', red)
+    sub = tiny_text('OF POOR LIFE CHOICES', ink)
+    im = Image.new('RGBA', (w, floor + 6 + verdict.height + 4 + sub.height), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    ix = (w - item_w) // 2
-    y = FACE.height + 4
-    for it in items:
-        d.rectangle((ix, y, ix + 4, y + 4), outline=ink)
-        for (dx, dy) in ((1, 2), (2, 3), (3, 2), (4, 1), (5, 0)):   # red check overflowing the box
-            im.putpixel((ix + dx, y + dy), red)
-        text3x5(im, ix + 9, y, it, ink)
-        y += 9
+    for i, mark in enumerate(('36', '30', '24', '18', '12')):        # height chart, in inches
+        y = 6 + i * 12
+        for x in range(12, w, 2):
+            im.putpixel((x, y), faint)
+        text3x5(im, 0, y - 2, mark, faint)
+    d.line((8, floor, w - 1, floor), fill=ink)
+    rx = (w + 10 - rac.width) // 2
+    im.alpha_composite(rac, (rx, floor - rac.height + 1))
+    l1, l2 = tiny_text('ASHLAND VA', board_ink), tiny_text('NOV 2025', board_ink)
+    bw, bh = l1.width + 8, 17
+    bx, by = rx + rac.width // 2 + 5 - bw // 2, floor - 27
+    d.rectangle((bx, by, bx + bw - 1, by + bh - 1), fill=board, outline=board_ink)
+    im.alpha_composite(l1, (bx + 4, by + 3))
+    im.alpha_composite(l2, (bx + (bw - l2.width) // 2, by + 10))
+    for px_ in (bx - 1, bx + bw - 3):                                  # paws gripping the placard
+        d.rectangle((px_, by + 5, px_ + 3, by + 9), fill=hexrgb(R.PALETTE['M']), outline=board_ink)
+    im.alpha_composite(verdict, centered(verdict, w / 2, floor + 6))
+    im.alpha_composite(sub, centered(sub, w / 2, floor + 6 + verdict.height + 4))
     return im
 
 
 # ---------------------------------------------------------------------------
-# Hoodie: wordmark front, "dropped in" back
+# Hoodie: face and wordmark on the chest, "last call" on the back
 # ---------------------------------------------------------------------------
 def design_wordmark():
     logo = Image.open(os.path.join(ROOT, 'assets', 'ui', 'logo.png')).convert('RGBA')
@@ -204,56 +217,48 @@ def design_wordmark():
     return im
 
 
-def ceiling_band(w, h=10):
-    im = Image.new('RGBA', (w, h + 4), (0, 0, 0, 0))
+def shelf_board(w):
+    im = Image.new('RGBA', (w, 6), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    tile, tbar, dark = hexrgb('#dedad1'), hexrgb('#a9a69d'), hexrgb('#1a1412')
-    d.rectangle((0, 0, w - 1, h - 1), fill=tile)
-    for x in range(w // 2 % 16, w, 16):
-        d.line((x, 0, x, h - 1), fill=tbar)
-    d.line((0, h - 1, w - 1, h - 1), fill=hexrgb('#8f8c84'))
-    hx0, hx1 = w // 2 - 12, w // 2 + 12
-    d.rectangle((hx0, 0, hx1, h - 3), fill=dark)
-    for i, x in enumerate(range(hx0, hx1 + 1)):
-        yy = h - 2 + (1 if i % 5 in (1, 2) else 0) + (1 if i % 7 == 3 else 0)
-        d.line((x, h - 3, x, yy), fill=dark)
-    for x in (hx0 + 4, hx0 + 10, hx1 - 5):
-        d.line((x, h - 2, x, h + 1), fill=hexrgb('#d9c79a'))
-    return im
+    d.rectangle((0, 0, w - 1, 3), fill=hexrgb('#8a9296'))
+    d.line((0, 0, w - 1, 0), fill=hexrgb('#b9c0c2'))
+    d.line((0, 3, w - 1, 3), fill=hexrgb('#5d6569'))
+    for x in range(6, w - 4, 16):
+        d.rectangle((x, 4, x + 5, 5), fill=hexrgb('#f6f1e7'))
+        d.point((x + 2, 5), fill=PAL['red'])
+    return ink_outline_pad(im)
 
 
-def tumbling_raccoon():
-    """Standing pose upside down: head-first through the ceiling."""
-    return rac(0, 3).transpose(Image.FLIP_TOP_BOTTOM)
+def ink_outline_pad(im):
+    pad = Image.new('RGBA', (im.width + 2, im.height + 2), (0, 0, 0, 0))
+    pad.alpha_composite(im, (1, 1))
+    return ink_outline(pad)
 
 
-def design_drop(w=92, with_text=False):
-    body = tumbling_raccoon()
-    hat = art(HAT_SIDE, HAT_SIDE_PAL).rotate(-20, expand=True, resample=Image.NEAREST)
-    h = body.height + 26 + (22 if with_text else 0)
-    im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-    band = ceiling_band(w)
-    im.alpha_composite(ink_outline(band), (0, 0))
-    d = ImageDraw.Draw(im)
-    rx = w // 2 - body.width // 2 + 4
-    cream = PAL['cream']
-    for (x, y0, y1) in ((rx + 8, 13, 19), (rx + 20, 12, 20), (rx + body.width - 12, 14, 19), (w // 2 + 2, 12, 17)):
-        d.line((x, y0, x, y1), fill=cream)
-    for (x, y, c) in ((rx - 6, 20, hexrgb('#dedad1')), (rx + body.width, 28, hexrgb('#dedad1')), (rx + body.width - 4, 44, hexrgb('#a9a69d')), (rx - 9, 38, hexrgb('#a9a69d'))):
-        d.rectangle((x, y, x + 2, y + 1), fill=c)
-    im.alpha_composite(body, (rx, 22))
-    im.alpha_composite(hat, (w // 2 + 15, 12))
+def design_last_call(w=84, with_text=True):
+    """On the top shelf, mid-swipe, one bottle already on its way down."""
+    rac = SWIPE_SANTA
+    title = font_text('LAST CALL', PAL['cream'])
+    top = title.height + 6 if with_text else 0
+    floor = top + rac.height
+    foot = tiny_text('ASHLAND VA  EST 2025', PAL['amber'])
+    im = Image.new('RGBA', (w, floor + 8 + (foot.height + 3 if with_text else 0)), (0, 0, 0, 0))
     if with_text:
-        t1 = font_text('DROPPED IN', PAL['cream'])
-        t2 = tiny_text('FOR THE HOLIDAYS', PAL['amber'])
-        y = 22 + body.height + 3
-        im.alpha_composite(t1, centered(t1, w / 2, y))
-        im.alpha_composite(t2, centered(t2, w / 2, y + t1.height + 3))
+        im.alpha_composite(title, centered(title, w / 2, 0))
+    board = shelf_board(w - 2)
+    im.alpha_composite(board, (0, floor - 1))
+    standing = bottle(0, 0)
+    im.alpha_composite(standing, (w - standing.width - 2, floor - standing.height))
+    im.alpha_composite(rac, (0, floor - rac.height))
+    flying = bottle(1, 1)
+    im.alpha_composite(flying, (rac.width - 5, floor - 42))
+    if with_text:
+        im.alpha_composite(foot, centered(foot, w / 2, floor + 9))
     return im
 
 
 def design_hoodie_back():
-    return design_drop(84, with_text=True)
+    return design_last_call(84, with_text=True)
 
 
 # ---------------------------------------------------------------------------
@@ -271,33 +276,30 @@ def _snow(im, n, seed, color=(244, 247, 251, 255), area=None):
         im.putpixel((rnd.randrange(x0, x1), rnd.randrange(y0, y1)), color)
 
 
-def ornament_drop():
-    """Feet still in the hole, head-first toward the viewer, hat flying off."""
-    bg = Image.new('RGBA', (ORN, ORN), hexrgb('#1d2947'))
-    _snow(bg, 40, 3)
-    band = ink_outline(ceiling_band(ORN))
-    bg.alpha_composite(band, (0, 5))
+def ornament_santa_panda():
+    """The face, two device pixels per art pixel, on a snowy pine green."""
+    bg = Image.new('RGBA', (ORN, ORN), hexrgb('#1d4a33'))
+    _snow(bg, 44, 3)
     content = Image.new('RGBA', (ORN, ORN), (0, 0, 0, 0))
-    body = tumbling_raccoon()
-    hat = art(HAT_SIDE, HAT_SIDE_PAL).rotate(-20, expand=True, resample=Image.NEAREST)
-    bx = ORN // 2 - body.width // 2 + 2
-    content.alpha_composite(body, (bx, 15))
-    content.alpha_composite(hat, (ORN // 2 + 14, 18))
+    big = upscale(FACE, 2)
+    content.alpha_composite(big, ((ORN - big.width) // 2, (ORN - big.height) // 2))
     return bg, content
 
 
-def ornament_reserve():
-    s = 45                       # drawn at half size, then doubled: chunky pixels, consistent scale
-    bg = Image.new('RGBA', (s, s), hexrgb('#7d1c25'))
-    _snow(bg, 18, 5, PAL['gold_sh'])
-    content = Image.new('RGBA', (s, s), (0, 0, 0, 0))
-    content.alpha_composite(RESERVE, ((s - RESERVE.width) // 2, (s - RESERVE.height) // 2))
-    for (x, y, big) in ((12, 12, True), (33, 15, True), (13, 30, False), (32, 29, False), (22, 5, False)):
-        content.putpixel((x, y), PAL['snow'])
-        if big:
-            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                content.putpixel((x + dx, y + dy), PAL['gold'])
-    return upscale(bg, 2), upscale(content, 2)
+def ornament_top_shelf():
+    """Seen from behind, halfway up the shelves, on a night-blue sky."""
+    bg = Image.new('RGBA', (ORN, ORN), hexrgb('#1d2947'))
+    _snow(bg, 40, 7)
+    content = Image.new('RGBA', (ORN, ORN), (0, 0, 0, 0))
+    rac = CLIMB_SANTA
+    upper, lower = shelf_board(42), shelf_board(58)
+    content.alpha_composite(upper, ((ORN - upper.width) // 2, 28))
+    content.alpha_composite(lower, ((ORN - lower.width) // 2, 62))
+    for kind, x in ((1, 17), (0, 62)):                 # one bottle left standing either side
+        b = bottle(kind, 0)
+        content.alpha_composite(b, (x, 63 - b.height))
+    content.alpha_composite(rac, ((ORN - rac.width) // 2, 14))
+    return bg, content
 
 
 def ornament_passed_out():
@@ -308,24 +310,23 @@ def ornament_passed_out():
     for y in range(4, ORN, 15):
         d.line((0, y, ORN, y), fill=hexrgb('#c9b997'))
     content = Image.new('RGBA', (ORN, ORN), (0, 0, 0, 0))
-    kx = 12                                            # placement found to sit fully in the safe circle
-    content.alpha_composite(KO, (kx, 32))
-    content.alpha_composite(LYING_HAT, (kx + KO.width - 30, 32 + KO.height - 8))
+    ko = PASSED_OUT
+    content.alpha_composite(ko, ((ORN - ko.width) // 2 + 1, 31))
     z1 = glyph(['###', '..#', '.#.', '#..', '###'], PAL['brown_dk'])
     z2 = glyph(['####', '...#', '..#.', '.#..', '####'], PAL['brown_dk'])
-    content.alpha_composite(z1, (50, 24))
-    content.alpha_composite(z2, (55, 17))
+    content.alpha_composite(z1, (56, 24))
+    content.alpha_composite(z2, (61, 16))
     return bg, content
 
 
 def ornament_back():
-    bg = Image.new('RGBA', (ORN, ORN), hexrgb('#1d3324'))
-    _snow(bg, 34, 9)
+    bg = Image.new('RGBA', (ORN, ORN), hexrgb('#7d1c25'))
+    _snow(bg, 34, 9, PAL['gold_sh'])
     content = Image.new('RGBA', (ORN, ORN), (0, 0, 0, 0))
     logo = Image.open(os.path.join(ROOT, 'assets', 'ui', 'logo.png')).convert('RGBA')
     content.alpha_composite(logo, ((ORN - logo.width) // 2, 22))
     for i, s in enumerate(('ASHLAND VA', f'HOLIDAY {SEASON}')):
-        t = tiny_text(s, PAL['cream_sh'] if i == 0 else PAL['gold'])
+        t = tiny_text(s, PAL['cream'] if i == 0 else PAL['gold'])
         content.alpha_composite(t, ((ORN - t.width) // 2, 56 + i * 8))
     return bg, content
 
@@ -358,26 +359,24 @@ MUG_W, MUG_H = 270, 105
 
 
 def mug_side_morning():
-    t1 = tiny_text('POOR LIFE', PAL['red'])
-    t2 = tiny_text('CHOICES', PAL['red'])
-    ko = passed_out_raccoon()
+    t1 = font_text('POOR LIFE', PAL['red'])
+    t2 = font_text('CHOICES', PAL['red'])
+    ko = PASSED_OUT
     w = max(ko.width, t1.width) + 2
-    im = Image.new('RGBA', (w, ko.height + 16), (0, 0, 0, 0))
+    im = Image.new('RGBA', (w, ko.height + 26), (0, 0, 0, 0))
     im.alpha_composite(t1, centered(t1, w / 2, 0))
-    im.alpha_composite(t2, centered(t2, w / 2, 7))
-    im.alpha_composite(ko, centered(ko, w / 2, 15))
+    im.alpha_composite(t2, centered(t2, w / 2, 10))
+    im.alpha_composite(ko, centered(ko, w / 2, 24))
     return im
 
 
 def mug_side_night():
-    t = tiny_text('LAST CALL', PAL['pine'])
-    stand = rac(1, 8)                                  # standing, Santa hat, swipe arc
-    flying = bottle(1, 1)                               # tipped whiskey bottle
-    w = stand.width + 18
-    im = Image.new('RGBA', (w, stand.height + 10), (0, 0, 0, 0))
+    t = font_text('LAST CALL', PAL['pine'])
+    scene = design_last_call(84, with_text=False)
+    w = max(scene.width, t.width)
+    im = Image.new('RGBA', (w, scene.height + 12), (0, 0, 0, 0))
     im.alpha_composite(t, centered(t, w / 2, 0))
-    im.alpha_composite(stand, (0, 9))
-    im.alpha_composite(flying, (stand.width - 6, 14))
+    im.alpha_composite(scene, centered(scene, w / 2, 12))
     return im
 
 
@@ -390,9 +389,9 @@ def mug_wrap():
 
 
 # ---------------------------------------------------------------------------
-# Beanie: embroidered face (4 universal thread colours)
+# Beanie: embroidered face (5 thread colours)
 # ---------------------------------------------------------------------------
-THREADS = {'dark': '#111111', 'light': '#f5f5f0', 'fur': '#8c8c8c', 'hat': '#c4161c'}
+THREADS = {'dark': '#111111', 'light': '#f5f5f0', 'fur': '#9a9a9a', 'shade': '#6b6b6b', 'hat': '#c4161c'}
 
 
 def beanie_embroidery():
@@ -402,42 +401,45 @@ def beanie_embroidery():
 # ---------------------------------------------------------------------------
 # Socks, wrap, cards, stickers
 # ---------------------------------------------------------------------------
+TAIL_DARK, TAIL_LIGHT = hexrgb(R.PALETTE['M']), hexrgb(R.PALETTE['L'])
+
+
 def sock_tile():
-    """Seamless 28x32: raccoon-tail rings, snowflakes and bottles."""
-    t = Image.new('RGBA', (28, 32), PAL['cream'])
+    """Seamless 28x32: the tail's own dark and light rings, with snowflakes and bottles."""
+    t = Image.new('RGBA', (28, 32), TAIL_LIGHT)
     d = ImageDraw.Draw(t)
-    d.rectangle((0, 0, 27, 4), fill=PAL['brown'])
-    d.line((0, 0, 27, 0), fill=hexrgb('#6e553e'))
-    t.alpha_composite(glyph(SNOWFLAKE, PAL['red']), (3, 10))
-    t.alpha_composite(glyph(MINI_BOTTLE, PAL['pine']), (18, 9))
-    d.rectangle((0, 18, 27, 22), fill=PAL['brown'])
-    d.line((0, 18, 27, 18), fill=hexrgb('#6e553e'))
-    t.alpha_composite(glyph(MINI_BOTTLE, PAL['pine']), (5, 24))
-    t.alpha_composite(glyph(SNOWFLAKE, PAL['red']), (17, 24))
+    for y0 in (0, 16):
+        d.rectangle((0, y0, 27, y0 + 5), fill=TAIL_DARK)
+        d.line((0, y0, 27, y0), fill=hexrgb(R.PALETTE['d']))
+    t.alpha_composite(glyph(SNOWFLAKE, PAL['red']), (3, 7))
+    t.alpha_composite(glyph(MINI_BOTTLE, PAL['pine']), (18, 7))
+    t.alpha_composite(glyph(MINI_BOTTLE, PAL['pine']), (5, 23))
+    t.alpha_composite(glyph(SNOWFLAKE, PAL['red']), (17, 23))
     return t
 
 
 def sock_leg():
-    leg = Image.new('RGBA', (28, 72), PAL['cream'])
+    leg = Image.new('RGBA', (28, 72), TAIL_LIGHT)
     dl = ImageDraw.Draw(leg)
-    for y0 in (4, 12, 52, 60):
-        dl.rectangle((0, y0, 27, y0 + 3), fill=PAL['brown'])
-        dl.line((0, y0, 27, y0), fill=hexrgb('#6e553e'))
-    leg.alpha_composite(FACE, (5, 24))
+    for y0 in (2, 12, 50, 60):
+        dl.rectangle((0, y0, 27, y0 + 5), fill=TAIL_DARK)
+        dl.line((0, y0, 27, y0), fill=hexrgb(R.PALETTE['d']))
+    leg.alpha_composite(FACE_SMALL, (5, 24))
     return leg
 
 
-def wrap_tile(bg=PAL['red']):
-    t = Image.new('RGBA', (48, 48), bg)
-    t.alpha_composite(FACE, (3, 2))
-    t.alpha_composite(FACE, (27, 26))
+def wrap_tile(bg=hexrgb('#1d4a33')):
+    """Seamless 60x64 brick repeat: two faces per tile on pine green."""
+    t = Image.new('RGBA', (60, 64), bg)
+    t.alpha_composite(FACE, (2, 2))
+    t.alpha_composite(FACE, (32, 34))
     sf = glyph(SNOWFLAKE, PAL['cream'])
-    t.alpha_composite(sf, (32, 6))
-    t.alpha_composite(sf, (8, 32))
+    t.alpha_composite(sf, (41, 6))
+    t.alpha_composite(sf, (10, 40))
     b = glyph(MINI_BOTTLE, PAL['gold'])
-    for xy in ((40, 16), (16, 40), (22, 12)):
+    for xy in ((52, 20), (22, 54), (33, 22), (4, 54)):
         t.alpha_composite(b, xy)
-    for (x, y) in ((44, 2), (2, 26), (26, 46), (46, 40), (20, 30)):
+    for (x, y) in ((56, 2), (30, 30), (2, 34), (58, 60), (46, 30), (16, 62)):
         t.putpixel((x, y), PAL['cream'])
     return t
 
@@ -446,27 +448,33 @@ CARD_W, CARD_H = 75, 105   # x20 = 1500 x 2100 = 5 x 7 in at 300 dpi
 
 
 def card_front():
+    """MERRY TRASHMAS: arms up, hat on, a bottle either side."""
     im = Image.new('RGBA', (CARD_W, CARD_H), PAL['cream'])
-    d = ImageDraw.Draw(im)
     for x in range(2, CARD_W - 2, 2):
         im.putpixel((x, 3), PAL['red'])
         im.putpixel((x, CARD_H - 4), PAL['pine'])
-    t1 = font_text("SEASON'S", PAL['red'])
-    t2 = font_text('GREETINGS', PAL['pine'])
-    ko = passed_out_raccoon()
-    s1 = tiny_text('FROM THE', PAL['brown'])
-    s2 = tiny_text('BATHROOM FLOOR', PAL['brown'])
-    y = 12
-    for img, gap in ((t1, 2), (t2, 10), (ko, 8), (s1, 2), (s2, 0)):
-        im.alpha_composite(img, centered(img, CARD_W / 2, y))
-        y += img.height + gap
+    t1 = font_text('MERRY', PAL['red'])
+    t2 = font_text('TRASHMAS', PAL['pine'])
+    im.alpha_composite(t1, centered(t1, CARD_W / 2, 10))
+    im.alpha_composite(t2, centered(t2, CARD_W / 2, 20))
+    rac = CHEER_SANTA
+    floor = 92
+    d = ImageDraw.Draw(im)
+    d.line((8, floor, CARD_W - 9, floor), fill=PAL['cream_sh'])
+    im.alpha_composite(rac, (CARD_W // 2 - rac.width // 2 - 2, floor - rac.height + 1))
+    for (x, y, big) in ((10, 40, True), (64, 44, True), (15, 60, False), (61, 62, False), (56, 34, False)):
+        im.putpixel((x, y), PAL['gold'])
+        if big:
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                im.putpixel((x + dx, y + dy), PAL['gold_sh'])
+    s = tiny_text('FROM ASHLAND VA', PAL['brown'])
+    im.alpha_composite(s, centered(s, CARD_W / 2, floor + 3))
     return im
 
 
 def card_back():
     im = Image.new('RGBA', (CARD_W, CARD_H), PAL['cream'])
-    face = FACE
-    im.alpha_composite(face, centered(face, CARD_W / 2, 66))
+    im.alpha_composite(FACE_SMALL, centered(FACE_SMALL, CARD_W / 2, 66))
     t = tiny_text('TRASHEDPANDA.LOL', PAL['brown'])
     im.alpha_composite(t, centered(t, CARD_W / 2, 92))
     return im
@@ -474,13 +482,10 @@ def card_back():
 
 def sticker_designs():
     logo = Image.open(os.path.join(ROOT, 'assets', 'ui', 'logo.png')).convert('RGBA')
-    store = Image.open(os.path.join(GAME, 'store.png')).convert('RGBA')
-    poster = store.crop((95, 51, 135, 99))
-    poster = poster.crop(poster.getbbox())
     return {
         'santa-panda': FACE,
+        'on-the-prowl': WALK_SANTA,
+        'passed-out': PASSED_OUT,
         'holiday-reserve': RESERVE,
-        'passed-out': passed_out_raccoon(),
         'wordmark': logo,
-        'holiday-spirits': poster,
     }

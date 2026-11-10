@@ -207,7 +207,7 @@ function renderCart() {
   if (!lines.length) {
     body.innerHTML = `
       <div class="empty">
-        <img src="../assets/shop/print-sticker-passed-out.png" alt="" width="152" height="74" />
+        <img src="../assets/shop/print-sticker-passed-out.png" alt="" width="146" height="64" />
         <p><b>Your cart is empty.</b><br />The raccoon took everything.</p>
         <button class="btn btn--primary" type="button" data-close>Keep shopping</button>
       </div>`;
@@ -278,7 +278,7 @@ const notice = $('#notice');
 function showNotice(title, text, link) {
   notice.innerHTML = `
     <div class="notice__inner">
-      <img src="../assets/ui/raccoon-face.png" width="18" height="22" alt="" />
+      <img src="../assets/ui/raccoon-face.png" width="18" height="21" alt="" />
       <h2 id="notice-title">${esc(title)}</h2>
       <p>${esc(text)}</p>
       <div class="notice__actions">

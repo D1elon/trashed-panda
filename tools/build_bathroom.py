@@ -20,7 +20,8 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
 from pixlib import hexrgb, upscale, text3x5, text3x5_width  # noqa: E402
 from build_store import Canvas, C as STORE  # noqa: E402
-from build_sprites import art, HAT_SIDE, HAT_PAL, RC_W, RC_H, BT_W, BT_H  # noqa: E402
+from build_sprites import RC_W, RC_H, BT_W, BT_H  # noqa: E402
+import raccoon  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 GAME = os.path.join(ROOT, 'assets', 'game')
@@ -303,9 +304,9 @@ def main():
 
     rac = Image.open(os.path.join(GAME, 'raccoon.png')).convert('RGBA')
     bottles = Image.open(os.path.join(GAME, 'bottles.png')).convert('RGBA')
-    # asleep on its back: the game's knocked-out pose, but with the closed-eye blink frame,
-    # head to the left so the DOM "z z Z" (css/game.css .over__zzz) rises over the tiles
-    asleep = sprite(rac, 0, 4, RC_W, RC_H).transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
+    # asleep on its back: the game's knocked-out pose with its eyes closed (sheet cell
+    # extra/2), head to the left so the DOM "z z Z" (css/game.css .over__zzz) rises over the tiles
+    asleep = sprite(rac, 2, 4, RC_W, RC_H).transpose(Image.FLIP_LEFT_RIGHT)
     bb = asleep.getbbox()
     cx, floor = 196, 168
     rx = cx - (bb[0] + bb[2]) // 2
@@ -323,14 +324,13 @@ def main():
     cv.blit(lying, 82 - (lb[0] + lb[2]) // 2, 169 - lb[3])
     cv.blit(asleep, rx, ry)
     # the Santa hat came off: on the tiles by its head
-    hat = art(HAT_SIDE, HAT_PAL, flip=True).rotate(20, expand=True, resample=Image.NEAREST)
-    hx = rx + bb[0] - hat.width + 2
+    hat = raccoon.hat('side').transpose(Image.FLIP_LEFT_RIGHT)       # upright: rotating pixel art smears it
+    hx = rx + bb[0] - hat.width - 3
     soft_shadow(cv, hx + hat.width // 2, 172, hat.width - 6)
     cv.blit(hat, hx, 172 - hat.height + 1)
 
     cv.im.save(os.path.join(GAME, 'bathroom.png'), optimize=True)
-    eye = (rx + RC_W - 1 - 62, ry + RC_H - 1 - 27)   # the walk frame's eye (62, 27), after both flips
-    head = (eye[0] + 4, eye[1] - 18)                   # where the z's start: just above the head
+    head = (rx + bb[0] + 10, ry + bb[1] - 8)           # where the z's start: just above the head
     if PREVIEW:
         upscale(cv.im, 3).save(os.path.join(PREVIEW, 'bathroom.png'))
     print('bathroom ok', cv.im.size, 'head at', head, f'({head[0] / W:.0%}, {head[1] / H:.0%})')

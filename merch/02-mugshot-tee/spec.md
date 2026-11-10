@@ -1,10 +1,10 @@
-# Naughty List Tee
+# Mugshot Tee
 
-**Retail:** $32  ·  **Shop id:** `naughty-list-tee`
+**Retail:** $32  ·  **Shop id:** `mugshot-tee`
 
 ## Design
 
-Santa's list, already filled in: BROKE IN, SMASHED THE SHELVES, DRANK THE EVIDENCE, PASSED OUT, each one ticked in red, signed with the Santa Panda.
+The booking photo. The raccoon stands against a height chart in its Santa hat, holding a placard that reads ASHLAND VA, NOV 2025. Verdict underneath: GUILTY of poor life choices.
 
 ## Production
 
@@ -18,16 +18,16 @@ Santa's list, already filled in: BROKE IN, SMASHED THE SHELVES, DRANK THE EVIDEN
 
 | Placement | File | Size / position |
 | --- | --- | --- |
-| Front | `front-<garment>-garment.png` | 12 x 16 in print area, art 10.89 x 7.85 in, top-aligned (about 3 in below collar) |
+| Front | `front-<garment>-garment.png` | 12 x 16 in print area, art 10.93 x 11.89 in, top-aligned (about 3 in below collar) |
 
 ### Files (`print/`)
 
 | File | Pixels | Notes |
 | --- | --- | --- |
-| `front-black-garment.png` | 3600 x 4800 | Black tees. Cream ink, near-black outline knocked out. Art 10.89 in wide, top of print area. |
-| `front-forest-garment.png` | 3600 x 4800 | Forest tees. Cream ink with dark outline kept (it shows on green). |
+| `front-black-garment.png` | 3600 x 4800 | Black tees. Near-black outline knocked out. Art 10.93 in wide, top of print area. |
+| `front-forest-garment.png` | 3600 x 4800 | Forest tees. Dark outline kept (it shows on green). |
 | `front-oatmeal-garment.png` | 3600 x 4800 | Heather Oatmeal tees. Dark ink version. |
-| `artwork-only-light.png` | 3268 x 2356 | Trimmed artwork for templates with a different print area. |
+| `artwork-only-light.png` | 3280 x 3567 | Trimmed artwork for templates with a different print area. |
 
 ### Notes
 

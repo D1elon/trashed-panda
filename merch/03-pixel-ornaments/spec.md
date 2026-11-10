@@ -4,7 +4,7 @@
 
 ## Design
 
-Three scenes from the night, each a full-bleed porcelain disc: feet-first through the ceiling on a snowy night sky, the Holiday Reserve on deep red, and passed out on the bathroom tiles. The back of every ornament carries the wordmark and HOLIDAY 2026, so each year's ornament is a dated keepsake.
+Three full-bleed porcelain discs: the Santa Panda face on snowy pine green, the climb to the top shelf seen from behind on a night sky, and passed out on the bathroom tiles with the hat hooked on one foot. The back of every ornament carries the wordmark and HOLIDAY 2026, so each year's ornament is a dated keepsake.
 
 ## Production
 
@@ -12,7 +12,7 @@ Three scenes from the night, each a full-bleed porcelain disc: feet-first throug
 | --- | --- |
 | Recommended blank | Printful: Ceramic Ornaments, 2-Side Print (circle, 2.99 in) |
 | Technique | Sublimation on porcelain, both sides |
-| Variants | Design: Through the Ceiling, Holiday Reserve, Passed Out. Back is shared. |
+| Variants | Design: Santa Panda, Top Shelf, Passed Out. Back is shared. |
 
 ### Placements
 
@@ -25,8 +25,8 @@ Three scenes from the night, each a full-bleed porcelain disc: feet-first throug
 
 | File | Pixels | Notes |
 | --- | --- | --- |
-| `drop.png` | 900 x 900 | Full-bleed square; background runs past the cut, artwork stays inside the safe circle. |
-| `reserve.png` | 900 x 900 | Full-bleed square; background runs past the cut, artwork stays inside the safe circle. |
+| `santa-panda.png` | 900 x 900 | Full-bleed square; background runs past the cut, artwork stays inside the safe circle. |
+| `top-shelf.png` | 900 x 900 | Full-bleed square; background runs past the cut, artwork stays inside the safe circle. |
 | `passed-out.png` | 900 x 900 | Full-bleed square; background runs past the cut, artwork stays inside the safe circle. |
 | `back.png` | 900 x 900 | Full-bleed square; background runs past the cut, artwork stays inside the safe circle. |
 

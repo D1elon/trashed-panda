@@ -16,8 +16,8 @@ const BH = SPRITES.bottles.h;
 const ROW = { walk: 0, climb: 1, drink: 2, swipe: 3, extra: 4 };
 const SANTA_ROWS = SPRITES.raccoon.santaRowOffset;
 const SPIN0 = SPRITES.bottles.spinStart;
-const RACCOON_CX = 39;      // body centre inside the 80px cell
-const CLIMB_FEET = 46;      // anchor row for the back-view climbing frames
+const RACCOON_CX = SPRITES.raccoon.cx;            // body centre inside the cell
+const CLIMB_FEET = SPRITES.raccoon.climbFeet;    // anchor row for the back-view climbing frames
 const FLOOR = WORLD.floorLane;
 
 const BULBS = [
@@ -467,8 +467,8 @@ export class Renderer {
 
     // drunk / KO flourishes around the head
     const ko = row === ROW.extra && col === 1;
-    const headX = ko ? r.x + r.facing * 10 : r.x + r.facing * (row === ROW.swipe ? 4 : 18);
-    const headY = ko ? r.y - 14 : r.y - (row === ROW.swipe ? 46 : 36);
+    const headX = ko ? r.x + r.facing * 23 : r.x + r.facing * (row === ROW.swipe ? 1 : 21);
+    const headY = ko ? r.y - 16 : r.y - (row === ROW.swipe ? 46 : 30);
     if (ko || (sim.buzz >= 60 && sim.active)) {
       const n = ko ? 3 : sim.buzz >= 80 ? 3 : 2;
       for (let i = 0; i < n; i++) {

@@ -59,9 +59,9 @@ export const PRODUCTS = [
     category: 'apparel',
     price: 64,
     badge: 'Holiday',
-    blurb: 'Knitted, not printed. Santa Panda, snowflakes and HOLIDAY SPIRITS.',
+    blurb: 'Knitted, not printed. One big raccoon face and tail-ring sleeves.',
     description:
-      'Charted stitch by stitch from the game’s pixel art: a yoke of trees and stars, the Santa Panda framed by snowflakes and tiny bottles over HOLIDAY SPIRITS, a bottle hem, TRASHED PANDA across the back and sleeves ringed like a raccoon’s tail. The ugliest sweater at the party, and the only one with a backstory.',
+      'Charted stitch by stitch from the game’s own sprite: the raccoon’s face fills the chest in charcoal, grey and cream, wearing a Santa hat in the sweater’s colour. A ringed-tail band crosses the yoke, TRASHED PANDA sits on the back, and both sleeves are ringed like the tail. The ugliest sweater at the party, and the only one with a backstory.',
     details: ['Jacquard knit: the pattern is in the yarn', 'Four-yarn chart, one pixel per stitch block', 'Pattern front, back and on both sleeves', 'Unisex classic fit', 'Made to order'],
     options: {
       Color: [
@@ -87,14 +87,14 @@ export const PRODUCTS = [
     shopify: {}, // 'Red / M': '1234567890'
   },
   {
-    id: 'naughty-list-tee',
-    name: 'Naughty List Tee',
+    id: 'mugshot-tee',
+    name: 'Mugshot Tee',
     category: 'apparel',
     price: 32,
-    blurb: 'Broke in. Smashed the shelves. Drank the evidence. Passed out.',
+    blurb: 'The booking photo. Guilty of poor life choices.',
     description:
-      'Santa’s list, already filled in and every box ticked: BROKE IN, SMASHED THE SHELVES, DRANK THE EVIDENCE, PASSED OUT. Signed by the Santa Panda. Big chunky pixels, printed sharp.',
-    details: ['Front print, about 11 in wide', 'Cream ink on black and forest, dark ink on oatmeal', 'Soft unisex fit', 'Printed to order'],
+      'The booking photo: the raccoon against a height chart in its Santa hat, holding a placard that reads ASHLAND VA, NOV 2025. The verdict is underneath: GUILTY of poor life choices. Big chunky pixels, printed sharp.',
+    details: ['Front print, about 11 in wide', 'Light lettering on black and forest, dark lettering on oatmeal', 'Soft unisex fit', 'Printed to order'],
     options: {
       Color: [
         {
@@ -120,26 +120,26 @@ export const PRODUCTS = [
     category: 'gifts',
     price: 18,
     badge: 'Collect 3',
-    blurb: 'Three moments from the night of the crime.',
+    blurb: 'The face, the climb and the morning after.',
     description:
-      'Through the ceiling, the Holiday Reserve, and passed out on the bathroom floor: three scenes from the night, each on a glossy porcelain disc. The back carries the wordmark and HOLIDAY 2026, so it’s a dated keepsake. Collect all three for a tree with a criminal record.',
+      'The Santa Panda face on snowy pine green, the climb to the top shelf seen from behind, and passed out on the bathroom tiles with the hat hooked on one foot: three scenes, each on a glossy porcelain disc. The back carries the wordmark and HOLIDAY 2026, so it’s a dated keepsake. Collect all three for a tree with a criminal record.',
     details: ['Porcelain, 3 in round', 'Printed on both sides', 'Comes ready to hang', 'Printed to order'],
     options: {
       Design: [
         {
-          value: 'Through the Ceiling', bg: '#3a2619',
+          value: 'Santa Panda', bg: '#3a2619',
           views: [
-            { label: 'Front', src: 'ornament-drop.png' },
+            { label: 'Front', src: 'ornament-santa-panda.png' },
             { label: 'Back', src: 'ornament-back.png' },
-            { label: 'Artwork', src: 'print-ornament-drop.png', flat: true },
+            { label: 'Artwork', src: 'print-ornament-santa-panda.png', flat: true },
           ],
         },
         {
-          value: 'Holiday Reserve', bg: '#1d3324',
+          value: 'Top Shelf', bg: '#1d3324',
           views: [
-            { label: 'Front', src: 'ornament-reserve.png' },
+            { label: 'Front', src: 'ornament-top-shelf.png' },
             { label: 'Back', src: 'ornament-back.png' },
-            { label: 'Artwork', src: 'print-ornament-reserve.png', flat: true },
+            { label: 'Artwork', src: 'print-ornament-top-shelf.png', flat: true },
           ],
         },
         {
@@ -159,9 +159,9 @@ export const PRODUCTS = [
     name: 'Trashed Panda Hoodie',
     category: 'apparel',
     price: 58,
-    blurb: 'Wordmark on the chest. Dropped in for the holidays on the back.',
+    blurb: 'Face and wordmark on the chest. LAST CALL on the back.',
     description:
-      'The game’s wordmark with the Santa Panda and Ashland, VA on the chest. On the back, the moment it all began: head-first through the ceiling tiles, DROPPED IN FOR THE HOLIDAYS. Kangaroo pocket for snacks you definitely paid for.',
+      'The Santa Panda face over the game’s wordmark and Ashland, VA on the chest. On the back, LAST CALL: the raccoon up on the top shelf, mid-swipe, with one bottle already on its way down. Kangaroo pocket for snacks you definitely paid for.',
     details: ['Chest print and full back print', 'Kangaroo pocket, drawstring hood', 'Unisex fit', 'Printed to order'],
     options: {
       Color: [
@@ -193,7 +193,7 @@ export const PRODUCTS = [
     price: 18,
     blurb: 'Two sides, two moods. For the morning after.',
     description:
-      'POOR LIFE CHOICES on one side: feet up, hat off, sleeping it off. LAST CALL on the other: mid-swipe, whiskey flying. Turn it to match your morning.',
+      'POOR LIFE CHOICES on one side: flat on its back, paws up, hat hooked on a foot. LAST CALL on the other: up on the shelf, mid-swipe, whiskey flying. Turn it to match your morning.',
     details: ['11 oz white ceramic', 'A different scene on each side', 'Printed to order'],
     options: { Size: ['11 oz'] },
     bg: '#22283a',
@@ -210,7 +210,7 @@ export const PRODUCTS = [
     price: 20,
     blurb: 'Ringed like the real thing.',
     description:
-      'Brown rings like a raccoon’s tail, scattered with snowflakes and tiny bottles, and a Santa Panda on the ankle. Ideal for sliding across tile floors.',
+      'Charcoal and pale grey rings, the same as the raccoon’s tail, scattered with red snowflakes and tiny green bottles, and a Santa Panda on the ankle. Ideal for sliding across tile floors.',
     details: ['Crew length', 'All-over print, seamless repeat', 'Printed to order'],
     options: { Size: ['S/M', 'L/XL'] },
     bg: '#3a1a1c',
@@ -227,8 +227,8 @@ export const PRODUCTS = [
     price: 30,
     blurb: 'Cuffed knit, pom-pom, embroidered face.',
     description:
-      'A cuffed knit beanie with a pom-pom and the Santa Panda embroidered on the cuff, redrawn in four thread colours so every stitch stays crisp. Keeps your ears warm while you think about your choices.',
-    details: ['Cuffed knit with pom-pom', 'Embroidered, 4 thread colours', 'One size', 'Made to order'],
+      'A cuffed knit beanie with a pom-pom and the Santa Panda embroidered on the cuff in five thread colours, so the mask, brows and grey fur all stay crisp. Keeps your ears warm while you think about your choices.',
+    details: ['Cuffed knit with pom-pom', 'Embroidered, 5 thread colours', 'One size', 'Made to order'],
     options: {
       Color: [
         {
@@ -250,10 +250,10 @@ export const PRODUCTS = [
     price: 22,
     blurb: 'Wrap their present in evidence.',
     description:
-      'Santa Panda faces, gold bottles and snowflakes on festive red. A seamless brick repeat, so every fold lines up.',
+      'Santa Panda faces, gold bottles and snowflakes on deep pine green. A seamless brick repeat, so every fold lines up.',
     details: ['Set of 3 sheets', 'Seamless repeat', 'Printed to order'],
     options: { Size: ['3 sheets'] },
-    bg: '#1d3324',
+    bg: '#3a1a1c',
     views: [
       { label: 'Sheet', src: 'wrap.png' },
       { label: 'Pattern', src: 'print-wrap.png', flat: true },
@@ -261,13 +261,13 @@ export const PRODUCTS = [
     shopify: {},
   },
   {
-    id: 'bathroom-floor-cards',
-    name: 'Bathroom Floor Holiday Cards',
+    id: 'trashmas-cards',
+    name: 'Merry Trashmas Cards',
     category: 'gifts',
     price: 16,
-    blurb: 'Season’s greetings from the bathroom floor.',
+    blurb: 'Merry Trashmas, from Ashland, VA.',
     description:
-      'SEASON’S GREETINGS from the bathroom floor, with the Santa Panda and the site on the back. A holiday card for people who appreciate a story. Blank inside for your own confession.',
+      'MERRY TRASHMAS: the raccoon with both arms in the air and its Santa hat on, with the Santa Panda face and the site on the back. A holiday card for people who appreciate a story. Blank inside for your own confession.',
     details: ['Pack of 6, folded 5 × 7 in', 'Blank inside', 'Envelopes included', 'Printed to order'],
     options: { Size: ['Pack of 6'] },
     bg: '#3a2619',
@@ -286,15 +286,15 @@ export const PRODUCTS = [
     badge: 'Collect 5',
     blurb: 'Five designs from the game. Stocking-stuffer sized.',
     description:
-      'The Santa Panda, the Holiday Reserve, the raccoon passed out, the wordmark, and the HOLIDAY SPIRITS sale poster from the store wall. Pick one, or pick all five.',
+      'The Santa Panda face, the raccoon on the prowl, passed out with the hat on one foot, the Holiday Reserve bottle, and the wordmark. Pick one, or pick all five.',
     details: ['4 in vinyl sticker, cut to shape', 'White border', 'Printed to order'],
     options: {
       Design: [
         { value: 'Santa Panda', bg: '#22283a', views: [{ label: 'Sticker', src: 'sticker-santa-panda.png' }] },
-        { value: 'Holiday Reserve', bg: '#1d3324', views: [{ label: 'Sticker', src: 'sticker-holiday-reserve.png' }] },
+        { value: 'On the Prowl', bg: '#203325', views: [{ label: 'Sticker', src: 'sticker-on-the-prowl.png' }] },
         { value: 'Passed Out', bg: '#3a2619', views: [{ label: 'Sticker', src: 'sticker-passed-out.png' }] },
+        { value: 'Holiday Reserve', bg: '#1d3324', views: [{ label: 'Sticker', src: 'sticker-holiday-reserve.png' }] },
         { value: 'Wordmark', bg: '#3a1a1c', views: [{ label: 'Sticker', src: 'sticker-wordmark.png' }] },
-        { value: 'Holiday Spirits', bg: '#203325', views: [{ label: 'Sticker', src: 'sticker-holiday-spirits.png' }] },
       ],
       Size: ['4 in'],
     },

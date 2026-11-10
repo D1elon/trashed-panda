@@ -42,7 +42,7 @@ the cart to **Shopify** at checkout, and Shopify talks to the print company:
    embroidered beanie, and compare it with the mockups.
 
 > The ugly sweater is a real jacquard knitting chart (four yarn colours, which is the
-> knitwear limit), the beanie face is redrawn for embroidery, and the build checks both
+> knitwear limit), the beanie face is reduced to five thread colours for embroidery, and the build checks both
 > against the production limits every time it runs.
 
 ## 2. Copy the variant IDs into the catalog

@@ -862,8 +862,8 @@ html.is-game .nav {
 
 .over__zzz {
   position: absolute;
-  left: 46%;   /* rising from the sleeping raccoon's head (assets/game/bathroom.png), clear of the toilet */
-  top: 69%;
+  left: 47%;   /* rising from the sleeping raccoon's head (assets/game/bathroom.png), clear of the toilet */
+  top: 72%;
   font: 10px var(--font-pixel);
   color: var(--snow);
   text-shadow: 2px 2px 0 var(--ink);

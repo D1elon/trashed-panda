@@ -36,7 +36,7 @@ if (hero) {
 
 // ---------------------------------------------------------------- holiday drop teaser
 // Product cards only while the shop is open; otherwise the teaser says "coming soon".
-const FEATURED = ['ugly-sweater', 'naughty-list-tee', 'pixel-ornament'];
+const FEATURED = ['ugly-sweater', 'mugshot-tee', 'pixel-ornament'];
 const grid = document.getElementById('teaser-grid');
 if (grid && shopOpen) {
   grid.innerHTML = FEATURED.map((id) => PRODUCTS.find((p) => p.id === id))

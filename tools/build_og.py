@@ -72,7 +72,7 @@ def og_shop():
     rnd = random.Random(5)
     for _ in range(110):
         im.putpixel((rnd.randrange(W), rnd.randrange(H - 34)), (244, 247, 251, 170))
-    for name, x, y in (('ornament-reserve.png', -8, 14), ('mug-morning.png', 236, 34), ('sweater-red-front.png', 120, 30)):
+    for name, x, y in (('ornament-santa-panda.png', -8, 14), ('mug-morning.png', 236, 34), ('sweater-red-front.png', 120, 30)):
         im.alpha_composite(Image.open(os.path.join(SHOP, name)).convert('RGBA'), (x, y))
     t = text8('THE HOLIDAY DROP', hexrgb('#fff4dc'))
     plate = Image.new('RGBA', (t.width + 10, t.height + 8), hexrgb('#d23a3a'))
