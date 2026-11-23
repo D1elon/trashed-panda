@@ -24,7 +24,6 @@ ICONS = {
     'play': ['.#......', '.##.....', '.###....', '.####...', '.####...', '.###....', '.##.....', '.#......'],
     'gear': ['...##...', '.#.##.#.', '..####..', '###..###', '###..###', '..####..', '.#.##.#.', '...##...'],
     'close': ['##....##', '###..###', '.######.', '..####..', '..####..', '.######.', '###..###', '##....##'],
-    'cart': ['##.......', '.#.......', '.########', '.#######.', '.######..', '.#.......', '.#######.', '..#...#..'],
     'share': ['....##..', '...####.', '..######', '....##..', '##..##..', '#......#', '#......#', '########'],
     'trophy': ['########', '#.####.#', '#.####.#', '.######.', '..####..', '...##...', '..####..', '.######.'],
     'clock': ['..####..', '.#.##.#.', '#..##..#', '#..###.#', '#......#', '#......#', '.#....#.', '..####..'],
@@ -72,7 +71,7 @@ def icon_svg():
 
 
 def raccoon_face(santa=True, small=True):
-    """The brand mark (favicon, nav, share image, merch): the game's own front-facing
+    """The brand mark (favicon, nav, share image): the game's own front-facing
     head from tools/raccoon.py; `small` is the same face at icon size."""
     return raccoon.face(santa, small=small)
 
@@ -188,10 +187,16 @@ def build_snow_tile():
     t.save(os.path.join(UI, 'snow-tile.png'))
 
 
+def build_passed_out():
+    """The 404 page's art: the raccoon passed out on its back, hat hooked on a foot."""
+    raccoon.pose(raccoon.lying('ko', hat=True)).save(os.path.join(UI, 'passed-out.png'))
+
+
 def main():
     icon_svg()
     build_snow_tile()
     build_help_icons()
+    build_passed_out()
     face = build_favicon()
     build_app_icons(face)
     logo = build_logo()

@@ -33,7 +33,6 @@
   <link rel="stylesheet" href="../css/site.css" />
   <link rel="stylesheet" href="../css/game.css" />
   <script type="module" src="../js/game/main.js"></script>
-  <script type="module" src="../js/play.js"></script>
 </head>
 <body class="page-play">
   <a class="skip-link" href="#stage">Skip to the game</a>
@@ -45,12 +44,7 @@
     </a>
     <nav class="nav__links" aria-label="Main">
       <a href="./" aria-current="page">Play</a>
-      <a href="../shop/">Shop <span class="tag tag--red" data-when="open">Holiday drop</span><span class="tag tag--red" data-when="soon">Soon</span></a>
     </nav>
-    <a class="nav__cart" href="../shop/#cart" aria-label="Cart" data-when="open">
-      <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-cart" /></svg>
-      <span class="nav__count" data-cart-count hidden>0</span>
-    </a>
   </header>
 
   <main class="arcade" id="play" aria-label="Trashed Panda game">
@@ -220,12 +214,6 @@
               <h3 class="board__title">Top bandits <small>on this device</small></h3>
               <ol class="board" id="board"></ol>
             </div>
-            <a class="merch-cta" href="../shop/">
-              <img src="../assets/shop/sweater-red-front.png" alt="" width="80" height="80" />
-              <span data-when="open"><b>Wear the crime.</b> The holiday drop is live: ugly sweaters, ornaments &amp; more.</span>
-              <span data-when="soon"><b>Wear the crime.</b> The holiday drop is coming soon: ugly sweaters, ornaments &amp; more.</span>
-              <svg class="ico" aria-hidden="true"><use href="../assets/ui/icons.svg#i-right" /></svg>
-            </a>
           </div>
         </div>
       </div>

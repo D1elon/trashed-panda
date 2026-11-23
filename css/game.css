@@ -1100,43 +1100,6 @@ html.is-game .nav {
   color: var(--muted);
 }
 
-.merch-cta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 14px 10px 10px;
-  text-align: left;
-  font-size: 16px;
-  line-height: 1.35;
-  color: var(--cream);
-  text-decoration: none;
-  background: var(--pine-lo);
-  box-shadow: inset 0 var(--px) 0 var(--pine), 0 0 0 2px var(--pine);
-}
-
-.merch-cta:hover {
-  background: var(--pine);
-  color: var(--cream);
-}
-
-.merch-cta img {
-  width: 80px;
-  height: 80px;
-  margin: -8px 0;
-  flex: none;
-  image-rendering: auto;
-}
-
-.merch-cta b {
-  color: var(--gold);
-}
-
-.merch-cta .ico {
-  margin-left: auto;
-  font-size: 14px;
-  color: var(--gold);
-}
-
 @container stage (min-width: 700px) {
   .over {
     width: min(100%, 920px);
