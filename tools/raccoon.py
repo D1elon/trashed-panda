@@ -1,7 +1,7 @@
 """The raccoon, drawn from scratch.
 
 One character model for the whole project: the game's sprite sheet, the brand face, the
-passed-out scene and every merch design are all rendered from this file, so they cannot
+passed-out scene and the 404 art are all rendered from this file, so they cannot
 drift apart.
 
 The heads are hand-placed pixel art (they carry the likeness). Bodies, limbs and the
@@ -631,7 +631,7 @@ def sheet_preview(scale=3, bg=(70, 78, 78, 255)):
 
 
 # ---------------------------------------------------------------------------
-# stand-alone pieces for the rest of the site and the merch
+# stand-alone pieces for the rest of the site
 # ---------------------------------------------------------------------------
 def rows_image(rows):
     cel = Cel(max(len(r) for r in rows), len(rows))
@@ -645,7 +645,7 @@ def hat(kind='side'):
 
 FACE_HAT_RISE = 7     # rows the hat adds above the head
 
-# The same face at icon size (nav, favicon, small repeats on merch). 18 x 14.
+# The same face at icon size (nav, favicon). 18 x 14.
 FACE_SMALL = [
     '.KKK..........KKK.',
     'KWMWK........KWMWK',
